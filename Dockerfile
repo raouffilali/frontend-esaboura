@@ -4,7 +4,7 @@ FROM node:16.10.0 AS build
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
+COPY package*.json ./
 
 # Install dependencies with legacy-peer-deps to resolve conflicts
 RUN npm install --legacy-peer-deps
