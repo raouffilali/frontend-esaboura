@@ -1,0 +1,114 @@
+<div class="sm-padding table-default">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <h3 class="mb-4" translate>Transaction Detail</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <table
+          id="table_id"
+          class="table table-horizontal tble-responsive"
+          [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+        >
+          <tbody>
+            <tr>
+              <td translate><span class="payment-detail-text">User Name:</span></td>
+              <td>
+                <span class="color-light-red" *ngIf="transaction && transaction.user">{{transaction?.user?.name}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span translate class="payment-detail-text">Course Name</span>:</td>
+              <td>{{transaction?.course?.name}}</td>
+            </tr>
+            <tr>
+              <td translate><span class="payment-detail-text">Code:</span></td>
+              <td>
+                <span>{{transaction?.code}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span translate *ngIf="transaction?.couponCode" class="payment-detail-text">Original price:</span
+                ><span translate *ngIf="!transaction?.couponCode" class="payment-detail-text">Price:</span>
+              </td>
+              <td>
+                <span *ngIf="!transaction?.couponCode">
+                  {{transaction?.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '):
+                  'symbol' : '1.0'}}
+                </span>
+                <span *ngIf="transaction?.couponCode">
+                  {{transaction?.discountAmount + transaction?.discountPrice | currency : (config?.currencySymbol ?
+                  config?.currencySymbol + ' ' : '$ '): 'symbol' : '1.0'}}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction?.couponCode">
+              <td translate><span class="payment-detail-text">Discount Price:</span></td>
+              <td>
+                <span
+                  >{{transaction?.discountPrice | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' :
+                  '$'): 'symbol' : '1.0'}}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction?.couponCode">
+              <td translate><span class="payment-detail-text"> Discount Amount:</span></td>
+              <td>
+                <span
+                  >{{transaction?.discountAmount | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' :
+                  '$ '): 'symbol' : '1.0'}}</span
+                >
+              </td>
+            </tr>
+            <tr *ngIf="transaction?.couponCode">
+              <td translate><span>Coupon Code:</span></td>
+              <td><span>{{transaction?.couponCode}}</span></td>
+            </tr>
+            <tr>
+              <td translate><span class="payment-detail-text">Earnings:</span></td>
+              <td>
+                <span
+                  >{{transaction?.balance | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$'):
+                  'symbol' : '1.0'}}</span
+                >
+              </td>
+            </tr>
+            <tr>
+              <td translate><span class="payment-detail-text">Created On</span>:</td>
+              <td><span>{{transaction?.createdAt | date}}</span></td>
+            </tr>
+            <tr>
+              <td><span translate class="payment-detail-text">Status</span>:</td>
+              <td>
+                <span class="label label-light-warning" *ngIf="transaction?.status === 'pending'" translate
+                  >Pending</span
+                >
+                <span class="label label-light-danger" *ngIf="transaction?.status === 'canceled'" translate
+                  >Canceled</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'progressing'" translate
+                  >In Progress</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'completed'" translate
+                  >Completed</span
+                >
+                <span class="label label-light-warning" *ngIf="transaction?.status === 'pending-refund'" translate
+                  >Pending refund</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'approved-refund'" translate>
+                  Approved refund
+                </span>
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'refunded'" translate
+                  >Refunded</span
+                >&nbsp;
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

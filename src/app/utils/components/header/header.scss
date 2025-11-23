@@ -1,0 +1,21 @@
+.nav-noti {
+  background-color: #000000;
+  height: 2.5em;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  p {
+    font-size: 1.05em;
+    font-weight: 600;
+    color: white;
+  }
+  .noti-text {
+    display: flex;
+    align-items: baseline;
+  }
+  .button-cancle {
+    background-color: transparent;
+    border-color: transparent;
+  }
+}

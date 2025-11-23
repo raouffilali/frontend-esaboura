@@ -1,0 +1,344 @@
+<div class="d-flex flex-column flex-root">
+  <!--begin::Login-->
+  <div class="login d-flex flex-column flex-lg-row flex-column-fluid">
+    <!--begin::Aside-->
+    <div class="login-aside d-flex flex-column flex-row-auto">
+      <!--begin::Aside Top-->
+      <div class="d-flex flex-column-auto flex-column pt-100">
+        <!--begin::Aside header-->
+        <a [routerLink]="['/home']" class="login-logo text-center pt-lg-25 pb-10">
+          <img src="{{ appConfig?.siteLogo || '../assets/images/logo/livelearn-header-logo.png' }}" class="" alt="" />
+        </a>
+        <!--end::Aside header-->
+        <!--begin::Aside Title-->
+        <p class="mt-4 text-center sub-content" translate>
+          <span translate>Join Pinlearn For Free</span> <br />
+          <span translate
+            >Unlock your potential with our diverse courses and interactive live classes. Elevate your skills with
+            Esaboura
+          </span>
+        </p>
+        <!--end::Aside Title-->
+      </div>
+      <!--end::Aside Top-->
+      <!--begin::Aside Bottom-->
+      <div
+        class="aside-img"
+        [style]="
+          appConfig && appConfig.signupImage
+            ? { 'background-image': 'url(' + appConfig.signupImage + ')' }
+            : { 'background-image': 'url(' + 'assets/images/login/signup-bg.svg' + ')' }
+        "
+      ></div>
+      <!--end::Aside Bottom-->
+    </div>
+    <!--begin::Aside-->
+    <!--begin::Content-->
+    <div class="login-content d-flex justify-content-center align-items-center w-100">
+      <!--begin::Wrapper-->
+      <div class="d-flex justify-content-center w-100 p-5">
+        <!--begin::Signin-->
+        <div class="login-form">
+          <!--begin::Form-->
+          <form class="form text-left" #frm="ngForm" (submit)="submit(frm)">
+            <!--begin::Title-->
+            <div class="pb-4">
+              <h3 class="" translate>Create Account</h3>
+              <p class="text-muted sub-content" translate>
+                <span translate>Already have an Account</span> ?
+                <a [routerLink]="['/auth/login']" class="color-light-red" translate>Sign In</a>
+              </p>
+            </div>
+            <div id="cardDivtutor" class="details">
+              <span class="text-muted sub-content mb-2" translate>Timezone</span>
+              <app-timezone [userTz]="account.timezone" (onChange)="changeTimezone($event)"></app-timezone>
+              <!-- ?? Start of new update to make First letter in Uppercase  -->
+              <div class="form-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="{{ 'Enter your first name' | translate }}"
+                  #firstNameInput
+                  name="firstName"
+                  required
+                  [(ngModel)]="account.firstName"
+                  (blur)="capitalizeFirstLetter('firstName')"
+                />
+                <div *ngIf="firstNameInput.errors && (firstNameInput.dirty || firstNameInput.touched || submitted)">
+                  <p [hidden]="!firstNameInput.errors.required" class="error" translate>First name is required</p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="{{ 'Enter your last name' | translate }}"
+                  #lastNameInput
+                  name="lastName"
+                  required
+                  [(ngModel)]="account.lastName"
+                  (blur)="capitalizeFirstLetter('lastName')"
+                />
+                <div *ngIf="lastNameInput.errors && (lastNameInput.dirty || lastNameInput.touched || submitted)">
+                  <p [hidden]="!lastNameInput.errors.required" class="error" translate>Last name is required</p>
+                </div>
+              </div>
+              <!-- ?? End of new update to make First letter in Uppercase  -->
+
+              <!-- ?? Add a dive that show firstname and last name make it read only and borders make it dotted  -->
+              <!-- YourComponent.html -->
+
+              <div
+                *ngIf="account.firstName && account.lastName"
+                class="form-group border border-dotted order-3 border-success p-2"
+                [@fadeInOut]
+              >
+                <label>{{
+                  'This is the name that will appear on your Certificates of Participation' | translate
+                }}</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  readonly
+                  name="name"
+                  [value]="account.firstName && account.lastName ? account.firstName + ' ' + account.lastName : ''"
+                  placeholder="Certificates of Participation Name"
+                  [(ngModel)]="account.name"
+                />
+              </div>
+
+              <div class="form-group">
+                <input
+                  id="email-input"
+                  type="text"
+                  class="form-control"
+                  placeholder="{{ 'Enter your email' | translate }}"
+                  #email="ngModel"
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                  name="email"
+                  required
+                  [(ngModel)]="account.email"
+                />
+                <small class="form-text text-muted text-left" translate
+                  >We'll never share your email with anyone else.</small
+                >
+                <!-- to avoid showing this error that confuse users we are going to delete just the property (|| email.touched ) it does not affect the code because we are adding required prop  and error catcher in submit  function -->
+                <div *ngIf="email.errors && (email.dirty || submitted)">
+                  <p [hidden]="!email.errors.required" class="error" translate>Email is required</p>
+                  <p [hidden]="!email.errors.pattern" class="error" translate>Email is invalid format</p>
+                </div>
+              </div>
+              <!-- ?? Adding phone number field -->
+              <div class="form-group">
+                <input
+                  id="phone-input"
+                  type="text"
+                  class="form-control"
+                  placeholder="{{ 'Enter your phone number' | translate }}"
+                  #phoneNumber="ngModel"
+                  pattern="^(?:\+|00)[0-9]{1,3}[0-9]{9,15}$|^(0[567][0-9]{8})$"
+                  name="phoneNumber"
+                  required
+                  [(ngModel)]="account.phoneNumber"
+                />
+                <small class="form-text text-muted text-left" translate
+                  >We'll never share your phone number with anyone else.</small
+                >
+                <!-- to avoid showing this error that confuse users we are going to delete just the property (|| email.touched ) it does not affect the code because we are adding required prop  and error catcher in submit  function -->
+                <div *ngIf="phoneNumber.errors && (phoneNumber.dirty || submitted)">
+                  <p [hidden]="!phoneNumber.errors.required" class="error" translate>phoneNumber is required</p>
+                  <p [hidden]="!phoneNumber.errors.pattern" class="error" translate>phoneNumber is invalid format</p>
+                </div>
+              </div>
+              <!-- ?? Adding phone number field -->
+              <div class="form-group">
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="{{ 'Password' | translate }}"
+                  [minlength]="6"
+                  #pw="ngModel"
+                  required
+                  name="password"
+                  [(ngModel)]="account.password"
+                />
+                <div *ngIf="pw.errors && (pw.dirty || pw.touched || submitted)">
+                  <p [hidden]="!pw.errors.minlength" class="error" translate>
+                    Password must be from 6 characters length
+                  </p>
+                  <p [hidden]="!pw.errors.required" class="error" translate>Password is required</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <input
+                  type="password"
+                  class="form-control"
+                  placeholder="{{ 'Confirm Password' | translate }}"
+                  #cf="ngModel"
+                  required
+                  name="confirm"
+                  [(ngModel)]="confirm.pw"
+                />
+                <div *ngIf="cf.errors && (cf.dirty || cf.touched || submitted)">
+                  <p [hidden]="!cf.errors.required" class="error" translate>Confirm password is required</p>
+                </div>
+                <div *ngIf="isMath">
+                  <p class="error" translate>Confirm password and Password do not match</p>
+                </div>
+              </div>
+              <!-- <p class="text-secondary" *ngIf="account.type === 'tutor'" translate>Upload introduction video</p> -->
+              <div class="mt-3" *ngIf="account.type === 'tutor'">
+                <p translate>Upload introduction video</p>
+                <label class="custom-radio"
+                  ><span translate>Upload</span>
+                  <input
+                    type="radio"
+                    name="videotype"
+                    value="upload"
+                    (change)="changeUploadType($event)"
+                    [(ngModel)]="introVideoType"
+                  />
+                  <span class="checkmark"></span>
+                </label>
+                <label class="custom-radio" translate
+                  ><span translate>From youtube</span>
+                  <input
+                    type="radio"
+                    name="videotype"
+                    value="youtube"
+                    (change)="changeUploadType($event)"
+                    [(ngModel)]="introVideoType"
+                  />
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+              <div class="form-group" *ngIf="account.type === 'tutor' && introVideoType === 'youtube'">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="{{ 'Youtube Id' | translate }}"
+                  #video="ngModel"
+                  required
+                  name="video"
+                  [(ngModel)]="accountTutor.introYoutubeId"
+                />
+                <div *ngIf="video.errors && (video.dirty || video.touched || submitted)">
+                  <p [hidden]="!video.errors.required" class="error" translate>Youtube video Id is required</p>
+                </div>
+                <small translate>Please enter only ID</small>
+                <br />
+                <small
+                  >EG: https://www.youtube.com/watch?v=<strong>xRjlRfpsHGw</strong>
+                  <br />
+                  ID = <strong>xRjlRfpsHGw</strong></small
+                >
+                >
+              </div>
+              <div *ngIf="account.type === 'tutor' && introVideoType === 'upload'">
+                <p *ngIf="introVideo && introVideo.name">
+                  {{ introVideo.name }}
+                </p>
+                <app-file-upload [options]="introVideoOptions"></app-file-upload>
+                <small translate
+                  >Upload mp4 file, webm file, 3gp file, ogg file, wmv file or webm file for your video</small
+                >
+              </div>
+
+              <div *ngIf="account.type === 'tutor'">
+                <p class="text-secondary" translate>
+                  Upload verification document<small class="ml-1">
+                    (<span translate>Maximum size</span>: {{ maxFileSize }} mb)</small
+                  >
+                </p>
+                <p *ngIf="idDocumentFile && idDocumentFile.name">
+                  {{ idDocumentFile.name }}
+                </p>
+                <app-file-upload [options]="idDocumentOptions"></app-file-upload>
+                <small translate
+                  >Upload pdf file, docx file, rar file, jpg file, jpeg file, png file or zip file for your
+                  document</small
+                >
+              </div>
+
+              <div *ngIf="account.type === 'tutor'">
+                <p class="text-secondary" translate>
+                  Upload resume document<small class="ml-1" translate>
+                    (<span translate>Maximum size</span>: {{ maxFileSize }} mb)</small
+                  >
+                </p>
+                <p *ngIf="resumeFile && resumeFile.name">{{ resumeFile.name }}</p>
+                <app-file-upload [options]="resumeOptions"></app-file-upload>
+                <small translate>Upload pdf file for your document</small>
+              </div>
+
+              <div *ngIf="account.type === 'tutor'">
+                <p class="text-secondary" translate>
+                  Upload certification document<small class="ml-1">
+                    (<span translate>Maximum size</span>: {{ maxFileSize }} mb)</small
+                  >
+                </p>
+                <p *ngIf="certificationFile && certificationFile.name">
+                  {{ certificationFile.name }}
+                </p>
+                <app-file-upload [options]="certificationOptions"></app-file-upload>
+                <small translate>Upload pdf file for your document</small>
+              </div>
+            </div>
+            <div class="mt-3">
+              <h6 translate>Join as :</h6>
+              <label class="custom-radio" translate
+                ><span translate>Student</span>
+                <input type="radio" name="type" value="student" [(ngModel)]="account.type" />
+                <span class="checkmark"></span>
+              </label>
+              <label class="custom-radio"
+                ><span translate>Tutor</span>
+                <input type="radio" name="type" value="tutor" [(ngModel)]="account.type" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <div *ngIf="submitted && account.type === ''">
+              <p class="error" translate>Type is required</p>
+            </div>
+
+            <div class="form-group mt-2">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="{{ '(Optional) Enter referral code' | translate }}"
+                #referral="ngModel"
+                name="referral"
+                [(ngModel)]="account.referralCode"
+              />
+              <span class="alert-warning" translate
+                >&nbsp;&nbsp; If someone invited you to join Esaboura, then enter his referral code &nbsp;&nbsp;
+              </span>
+            </div>
+
+            <div class="mt-3 ml-4">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="agree" name="accept" value="accept" />
+              <label class="text-secondary mr-3" translate for="accept">
+                I agree to the website terms & conditions and privacy policy
+              </label>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-default mt-5 btn-block" type="submit" translate [disabled]="loading || !agree">
+                Sign Up
+              </button>
+            </div>
+            <!--end::Form group-->
+            <!--begin::Action-->
+            <!--end::Action-->
+          </form>
+          <!--end::Form-->
+        </div>
+        <!--end::Signin-->
+      </div>
+      <!--end::Wrapper-->
+    </div>
+    <!--end::Content-->
+  </div>
+  <!--end::Login-->
+</div>
+<!--end::Main-->

@@ -1,0 +1,138 @@
+<div class="card-horizontal input-border">
+  <form (submit)="submit()" #frm="ngForm" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label translate>All the end of my course, students will be able to</label>
+          <ul *ngIf="course.goalCourse.length">
+            <li style="list-style: none" *ngFor="let item of course.goalCourse, let i=index">
+              <button type="button" class="btn-transparent" (click)="removeItem('goalCourse',i)">
+                <i class="fa fa-trash text-danger font-sm"></i>
+              </button>
+              {{item}}
+            </li>
+          </ul>
+          <form class="row">
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  [(ngModel)]="courseGoal.goalCourse"
+                  name="goalCourse"
+                  class="form-control"
+                  placeholder="{{'All the end of my course, students will be able to'|translate}}"
+                />
+              </div>
+            </div>
+            <div class="col-md-2 d-flex text-right align-items-center justify-content-center">
+              <button
+                class="btn btn-green mt-n3"
+                [disabled]="!courseGoal.goalCourse.trim()"
+                (click)="addItem('goalCourse')"
+                translate
+              >
+                Add
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label translate>Who should take this course? Who should not?</label>
+          <ul *ngIf="course.whyJoinCourse.length">
+            <li style="list-style: none" *ngFor="let item of course.whyJoinCourse, let i=index">
+              <button type="button" class="btn-transparent" (click)="removeItem('whyJoinCourse',i)">
+                <i class="fa fa-trash text-danger font-sm"></i>
+              </button>
+              {{item}}
+            </li>
+          </ul>
+          <form class="row">
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  [(ngModel)]="courseGoal.whyJoinCourse"
+                  name="whyJoinCourse"
+                  class="form-control"
+                  placeholder="{{'Who should take this course? Who should not?'|translate}}"
+                />
+              </div>
+            </div>
+            <div class="col-md-2 d-flex text-right align-items-center justify-content-center">
+              <button
+                class="btn btn-green mt-n3"
+                [disabled]="!courseGoal.whyJoinCourse.trim()"
+                (click)="addItem('whyJoinCourse')"
+                translate
+              >
+                Add
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label translate>What will students need to know or do before starting this course?</label>
+          <ul *ngIf="course.needToJoinCourse.length">
+            <li style="list-style: none" *ngFor="let item of course.needToJoinCourse, let i=index">
+              <button type="button" class="btn-transparent" (click)="removeItem('needToJoinCourse',i)">
+                <i class="fa fa-trash text-danger font-sm"></i>
+              </button>
+              {{item}}
+            </li>
+          </ul>
+          <form class="row">
+            <div class="col-md-10">
+              <div class="form-group">
+                <input
+                  type="text"
+                  [(ngModel)]="courseGoal.needToJoinCourse"
+                  name="needToJoinCourse"
+                  class="form-control"
+                  placeholder="{{'What will students need to know or do before starting this course?'|translate}}"
+                />
+              </div>
+            </div>
+            <div class="col-md-2 d-flex text-right align-items-center justify-content-center">
+              <button
+                class="btn btn-green mt-n3"
+                [disabled]="!courseGoal.needToJoinCourse.trim()"
+                (click)="addItem('needToJoinCourse')"
+                translate=""
+              >
+                Add
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<ul class="list-inline" [ngClass]="{'float-right':!rtl, 'float-left': rtl}">
+  <li>
+    <button type="button" class="btn btn-light prev-step" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}" (click)="onTab(1)">
+      <i
+        class="fas wizard-arrow"
+        [ngClass]="{'fa-angle-double-left mr-1 ': !rtl, 'fa-angle-double-right ml-1': rtl}"
+      ></i
+      ><span translate>Previous</span>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="btn btn-default next-step" (click)="onTab(3)">
+      <span translate>Continue</span
+      ><i
+        class="fas wizard-arrow"
+        [ngClass]="{'fa-angle-double-right ml-1': !rtl, 'fa-angle-double-left mr-1': rtl}"
+      ></i>
+    </button>
+  </li>
+</ul>

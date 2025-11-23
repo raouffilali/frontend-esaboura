@@ -1,0 +1,107 @@
+<div class="card h-100 box-shadow-md border-none">
+  <div class="badge-tag" *ngIf="course?.featured">
+    <span translate>Featured</span>
+  </div>
+  <div class="image-course">
+    <a [routerLink]="['/courses/detail',course?.alias]" class="hyperlink">
+      <img
+        src="{{course?.mainImage?.fileUrl}}"
+        class="card-img-top"
+        alt=""
+        onerror="this.src='/assets/images/no-image.jpg'"
+    /></a>
+    <a
+      class="hyperlink link-profile avatar-profile"
+      [routerLink]="['/tutors', course?.tutor?.username]"
+      [ngClass]="{'position-left': !rtl, 'position-right': rtl}"
+    >
+      <img
+        src="{{course?.tutor?.avatarUrl}}"
+        class="float-right cate-profile box-shadow-lg"
+        alt=""
+        onerror="this.src='/assets/images/no-image.jpg'"
+      />
+    </a>
+  </div>
+
+  <div class="card-body">
+    <div class="row mt-n5 row-cols-2">
+      <div class="col-md-12 pr-0">
+        <div class="profile-card">
+          <div class="profile">
+            <a class="hyperlink link-profile" [routerLink]="['/tutors', course?.tutor?.username]">
+              <h5 class="cate-profile-name pt-sm" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                {{course?.tutor?.name ||'بدون اسم'}}
+              </h5>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-12 ">
+        <div class="row mt-n10 row-cols-2">
+        <div class="col-md-7 pr-0">
+        <div class="" [hidden]="!category" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <a
+            class="badge badge-default mt-2"
+            placement="bottom"
+            title="{{categories}}"
+            (click)="clickCategory(category?._id)"
+            >{{category?.name | ellipsis:14}}</a
+          >
+        </div>
+        </div>
+        <div class="col-md-5 pt-1" [ngClass]="{'pl-0': !rtl, 'pr-0': rtl}">
+          <div class="rating-stars rating-md-1 font-xs" [ngClass]="{'text-right': !rtl, 'text-left-important': rtl}">
+            <ul id="stars ml-1">
+              <star-rating [rate]="course?.tutor?.ratingAvg"></star-rating>
+              <span>{{course?.tutor?.ratingAvg}} ({{course?.tutor?.totalRating}})</span>
+            </ul>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-content mt-3" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+      <a class="hyperlink" [ngClass]="{'text-left': !rtl, 'text-right': rtl}" [routerLink]="['/courses/detail',course?.alias]" translate
+      >
+        <h5 class="card-title">{{course?.name | ellipsis:60}}</h5>
+      </a
+      >
+      <!-- <div *ngIf="course?.description">
+        <app-text-ellipsis
+          [content]="course?.description"
+          [showChar]="50"
+          [path]="'/courses/detail'"
+          [param]="course?.alias"
+        ></app-text-ellipsis>
+      </div> -->
+
+    </div>
+  </div>
+  <div class="card-footer bg-transparent border-text-mute p-3" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+    <div class="row row-cols-2">
+      <div class="col-md-6">
+        <!-- <a class="btn btn-green" [routerLink]="['/courses/detail',course?._id]" translate>Buy Now</a> -->
+        <a *ngIf="!course?.booked" class="btn btn-green" [routerLink]="['/courses/detail',course?.alias]" translate
+          >Buy Now</a
+        >
+        <a *ngIf="course?.booked" class="btn btn-purchased" [routerLink]="['/courses/detail',course?.alias]" translate
+          >Purchased</a
+        >
+      </div>
+      <div class="col-md-6 money" [ngClass]="{'text-right': !rtl, 'text-left': rtl}">
+        <h5 class="color-light-red mt-2">
+          <strong *ngIf="!course.price || course.isFree" translate>Free</strong>
+          <strong *ngIf="course.price && course.price > 0 && config?.currencySymbol !=='DZD'"
+            >{{ course?.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol' :
+            '1.0'}}</strong
+          >
+          <strong *ngIf="course.price && course.price > 0 && config?.currencySymbol ==='DZD'"
+            translate>{{ course.price | currency :'DA ' : 'symbol' : '1.0'}} ({{ course.price / 100 | currency :'$ ' : 'symbol' : '1.0'}})</strong
+          >
+        </h5>
+      </div>
+    </div>
+  </div>
+</div>

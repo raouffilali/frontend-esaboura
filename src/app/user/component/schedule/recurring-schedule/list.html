@@ -1,0 +1,100 @@
+<div class="data-table my-category-table">
+  <div class="row">
+    <div class="col-md-12">
+      <table
+        id="table_id"
+        class="table table-horizontal dataTable no-footer"
+        role="grid"
+        aria-describedby="table_id_info"
+        [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+      >
+        <thead>
+          <tr>
+            <th tabindex="0" aria-controls="table_id" rowspan="1" colspan="1">
+              <span (click)="sortBy('start', 'asc')" translate>Start time</span>
+              <app-sort [sortOption]="filter.sortOption" [sortBy]="'start'" (onSort)="onSort($event)"></app-sort>
+            </th>
+            <th tabindex="0" aria-controls="table_id" rowspan="1" colspan="1">
+              <span (click)="sortBy('end', 'asc')" translate>End time</span>
+              <app-sort [sortOption]="filter.sortOption" [sortBy]="'end'" (onSort)="onSort($event)"></app-sort>
+            </th>
+            <th tabindex="0" aria-controls="table_id" rowspan="1" colspan="1">
+              <span (click)="sortBy('dayOfWeek', 'asc')" translate>Days of week</span>
+              <app-sort [sortOption]="filter.sortOption" [sortBy]="'dayOfWeek'" (onSort)="onSort($event)"></app-sort>
+            </th>
+            <th tabindex="0" aria-controls="table_id" rowspan="1" colspan="1">
+              <span (click)="sortBy('range.start', 'asc')" translate>Start date</span>
+              <app-sort [sortOption]="filter.sortOption" [sortBy]="'range.start'" (onSort)="onSort($event)"></app-sort>
+            </th>
+            <th tabindex="0" aria-controls="table_id" rowspan="1" colspan="1">
+              <span (click)="sortBy('range.end', 'asc')" translate>End date</span>
+              <app-sort [sortOption]="filter.sortOption" [sortBy]="'range.end'" (onSort)="onSort($event)"></app-sort>
+            </th>
+            <th
+              tabindex="0"
+              aria-controls="table_id"
+              rowspan="1"
+              colspan="1"
+              aria-label="Action: activate to sort column ascending"
+            >
+              <a translate class="mr-2 cate-action">Action</a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!recurring.length && !loading">
+            <td translate colspan="4">There are no recurring</td>
+          </tr>
+
+          <tr *ngIf="loading">
+            <td translate colspan="4">Loading...</td>
+          </tr>
+          <tr *ngFor="let item of recurring, let i = index">
+            <td>{{renderTime(item?.start)}}</td>
+            <td>{{renderTime(item?.end)}}</td>
+            <td>{{renderDayOfWeek(item.dayOfWeek)}}</td>
+            <td>{{item?.range?.start | date}}</td>
+            <td>{{item?.range?.end | date}}</td>
+            <td>
+              <ng-template #popContent>
+                <div class="alert alert-warning">
+                  <p class="m-0">
+                    <span class="warning-icon"><i class="fas fa-exclamation-circle"></i></span> Slots already booked
+                    will not be deleted.
+                  </p>
+                </div>
+                <button class="btn btn-danger btn-sm btn-block" (click)="remove(item, i)">Delete</button>
+              </ng-template>
+              <ng-template #popTitle>Delete this recurring!</ng-template>
+              <button
+                type="button"
+                class="btn btn-light-default btn-sm btn-icon-padding"
+                [ngbPopover]="popContent"
+                [popoverTitle]="popTitle"
+              >
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-12">
+      <div class="dataTables_paginate paging_simple_numbers" id="table_id_paginate">
+        <ngb-pagination
+          [collectionSize]="filter.total"
+          [(page)]="filter.currentPage"
+          [pageSize]="filter.pageSize"
+          [maxSize]="5"
+          (pageChange)="loadListSchedule()"
+          class="float-right"
+        >
+          <ng-template ngbPaginationPrevious translate><span translate>Previous</span></ng-template>
+          <ng-template ngbPaginationNext translate><span translate>Next</span></ng-template>
+        </ngb-pagination>
+      </div>
+    </div>
+  </div>
+</div>

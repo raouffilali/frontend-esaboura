@@ -1,0 +1,14 @@
+{
+    "production": true,
+    "version": "3.0.7",
+    "build": 1,
+    "showBuild": true,
+    "maximumFileSize": 1024,
+    "apiBaseUrl": "https://api.esaboura.online/v1",
+    "stripeKey": "pk_test_51MALYlCXbLO4otsv0byg0W0E7Yn1qPRTi3OBULesGOcyD7e9bkusu6w2IhRcnA6VXROMDHdVioqOZtH00cBa2J7p000IIOfQvt",
+    "url": "https://esaboura.online",
+    "socketUrl": "https://api.esaboura.online",
+    "zoomSDK": "9NLkK6D58rk55oGvztVu2RZ5bWFnDsQ0WLQH",
+    "zoomDomain": ".esaboura.online",
+    "zoomSiteUrl": "https://lesson.esaboura.online"
+}

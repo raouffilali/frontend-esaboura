@@ -1,0 +1,13 @@
+<div class="container">
+  <div class="row" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+    <div class="col col-md-12">
+      <h1>{{post?.title}}</h1>
+    </div>
+    <div class="col col-md-12">
+      <!-- <p [innerHTML]="post?.content"></p> -->
+      <div class="ql-container ql-core" style="border-width: 0">
+        <div class="ql-editor" [ngClass]="{ 'text-right': rtl}" [innerHTML]="post?.content"></div>
+      </div>
+    </div>
+  </div>
+</div>

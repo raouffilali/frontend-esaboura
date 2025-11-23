@@ -1,0 +1,235 @@
+<div class="sm-padding data-table">
+  <div class="container">
+    <div class="row data-user">
+      <div class="col-md-12">
+        <div id="table_id_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+          <div class="row align-items-center">
+            <div class="col-sm-12 col-md-3">
+              <div class="dataTables_length" id="table_id_length">
+                <label [ngClass]="{'text-left': !rtl, 'text-right': rtl}" style="width: 100%" translate
+                  >Show entries</label
+                >
+                <select
+                  name="table_id_length"
+                  aria-controls="table_id"
+                  class="custom-select custom-select-sm form-control form-control-sm"
+                  [(ngModel)]="pageSize"
+                  (change)="query()"
+                  style="width: 100%"
+                >
+                  <option value="10" selected>10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-sm-12 col-md-3">
+              <div class="dataTables_length" id="table_id_length">
+                <label [ngClass]="{'text-left': !rtl, 'text-right': rtl}" style="width: 100%" translate
+                  >Category:</label
+                >
+                <select
+                  style="width: 100%"
+                  name="category"
+                  class="form-control"
+                  [(ngModel)]="searchFields.categoryIds"
+                  (change)="query()"
+                >
+                  <option selected translate value="">None</option>
+                  <option *ngFor="let cate of categories" value="{{cate._id}}">{{cate.name}}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-sm-12 col-md-3">
+              <div class="dataTables_length" id="table_id_length">
+                <label [ngClass]="{'text-left': !rtl, 'text-right': rtl}" style="width: 100%" translate>Search:</label>
+                <input
+                  style="width: 100%"
+                  name="search"
+                  type="search"
+                  class="form-control form-control-sm"
+                  aria-controls="table_id"
+                  placeholder="{{'Search here'|translate}}"
+                  (keyup)="doSearch($event)"
+                />
+              </div>
+            </div>
+
+            <div class="col-sm-12 col-md-3">
+              <div class="dataTables_length" id="table_id_length">
+                <label style="width: 100%"> </label>
+                <a class="btn btn-default ml-3 mt-2" [routerLink]="['/users/courses/create']"
+                  ><i class="fa fa-plus mr-2 font-sm"></i> <span translate>Add Course</span></a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12" [ngClass]="{'text-left': !rtl, 'text-right': rtl}" *ngIf="loading">
+            <p><span translate>Loading</span>...</p>
+          </div>
+          <div class="col-sm-12" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+            <table
+              id="table_id"
+              class="table table-horizontal tble-responsive table-user dataTable no-footer"
+              role="grid"
+              aria-describedby="table_id_info"
+            >
+              <thead>
+                <tr role="row">
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-sort="ascending"
+                    aria-label="Main Image: activate to sort column descending"
+                    translate
+                  >
+                    Main Image
+                  </th>
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="title: activate to sort column ascending"
+                  >
+                    <span (click)="sortBy('name', 'asc')" translate>Title</span>
+                    <app-sort [sortOption]="sortOption" [sortBy]="'title'" (onSort)="onSort($event)"></app-sort>
+                  </th>
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="Category: activate to sort column ascending"
+                  >
+                    <span (click)="sortBy('category', 'asc')" translate>Category</span>
+                    <app-sort [sortOption]="sortOption" [sortBy]="'category'" (onSort)="onSort($event)"></app-sort>
+                  </th>
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="Price: activate to sort column ascending"
+                    translate
+                  >
+                    <span (click)="sortBy('price', 'asc')" translate>Price</span>
+                    <app-sort [sortOption]="sortOption" [sortBy]="'price'" (onSort)="onSort($event)"></app-sort>
+                  </th>
+
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="Created At: activate to sort column ascending"
+                    style="width: 61px"
+                  >
+                    <span (click)="sortBy('createdAt', 'asc')" translate>CreatedAt</span>
+                    <app-sort [sortOption]="sortOption" [sortBy]="'createdAt'" (onSort)="onSort($event)"></app-sort>
+                  </th>
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="status: activate to sort column ascending"
+                  >
+                    <span (click)="sortBy('status', 'asc')" translate>Status</span>
+                    <app-sort [sortOption]="sortOption" [sortBy]="'status'" (onSort)="onSort($event)"></app-sort>
+                  </th>
+                  <th
+                    tabindex="0"
+                    aria-controls="table_id"
+                    rowspan="1"
+                    colspan="1"
+                    aria-label="Action: activate to sort column ascending"
+                    translate
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!loading">
+                <tr role="row" class="odd" *ngFor="let item of items, let i = index">
+                  <td class="sorting_1">
+                    <img
+                      src="{{item?.mainImage.thumbUrl}}"
+                      alt=""
+                      class="table-img"
+                      onerror="this.src='/assets/images/no-image.jpg'"
+                    />
+                  </td>
+                  <td>{{item?.name}}</td>
+                  <td>
+                    <span *ngFor="let cat of item.categories; let i = index"
+                      >{{ cat?.name }}
+                      <span *ngIf="i < item.categories.length - 1">, </span>
+                    </span>
+                  </td>
+                  <td>
+                    {{item?.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol'
+                    : '1.0' }}
+                  </td>
+                  <td>{{item?.createdAt | date:'mediumDate'}}</td>
+                  <td>
+                    <span class="label label-light-warning" *ngIf="!item?.approved" translate>Pending</span>
+                    <span class="label label-light-primary" *ngIf="item?.approved" translate>Approved</span>
+                  </td>
+                  <td>
+                    <a
+                      class="btn btn-light-default btn-hvr-primary btn-sm btn-icon-padding"
+                      [routerLink]="['/courses/detail',item?.alias]"
+                    >
+                      <i class="fa fa-eye"></i>
+                    </a>
+                    <a
+                      class="btn btn-light-default btn-hvr-primary btn-sm btn-icon-padding"
+                      [routerLink]="['/users/courses', item._id]"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </a>
+                    <a class="btn btn-light-danger btn-hvr-primary btn-sm btn-icon-padding" (click)="remove(item, i)">
+                      <i class="fa fa-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info" id="table_id_info" role="status" aria-live="polite" translate>
+              <span translate>Showing</span> <span>{{ fromItem }}</span> <span translate>to</span>
+              <span>{{ toItem }}</span> <span translate>of</span> <span>{{ total }}</span>
+              <span translate>entries</span>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-7">
+            <div class="dataTables_paginate paging_simple_numbers" id="table_id_paginate">
+              <ngb-pagination
+                [collectionSize]="total"
+                [(page)]="currentPage"
+                [pageSize]="pageSize"
+                [maxSize]="5"
+                (pageChange)="query()"
+                [ngClass]="{'float-right':!rtl, 'float-left': rtl}"
+              >
+                <ng-template ngbPaginationPrevious translate><span translate>Previous</span></ng-template>
+                <ng-template ngbPaginationNext translate><span translate>Next</span></ng-template>
+              </ngb-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

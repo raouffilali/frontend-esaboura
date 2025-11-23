@@ -1,0 +1,496 @@
+<section class="pt-5 pb-5">
+  <div class="container" *ngIf="course">
+
+    <div class="row">
+
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+
+            <!-- *Video Leftsection -->
+            <div class="col-md-6 position-relative video-course">
+              <!-- ?? an approach  to disable the right-click context menu on the video element -->
+              <video *ngIf="videoUrl" width="100%" height="100%" src="{{videoUrl}}" controls oncontextmenu="return false;"></video>
+            </div>
+
+            <!-- *Informations Right Section  -->
+            <div class="col-md-6 rmt-3">
+              <h4 class="font-weight-bold" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">{{course?.name}}</h4>
+              <div class="mb-3">
+                <a
+                  *ngFor="let cat of course.categories; let i = index"
+                  [routerLink]="['/categories']"
+                  [queryParams]="{ categoryIds: cat._id }"
+                  ><span class="badge badge-default mr-2">{{ cat.name }}</span></a
+                >
+              </div>
+              <p class="card-text"></p>
+              <div class="row row-cols-md-1 row-cols-lg-2">
+                <!-- tutor name and avatar -->
+                <div class="col-md-6">
+                  <div class="profile">
+                    <a [routerLink]="['/tutors', course?.tutor?.username]">
+                      <img
+                        src="{{course?.tutor?.avatarUrl}}"
+                        class="cate-profile box-shadow-lg"
+                        alt=""
+                        onerror="this.src='/assets/images/no-image.jpg'"
+                        [ngClass]="{'float-left': !rtl, 'float-right': rtl, 'mr-2': !rtl, 'ml-2': rtl}"
+                      />
+                      <h5 class="pt-3 font-sm" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                        {{course?.tutor?.name}}
+                      </h5>
+
+                    </a>
+                  </div>
+                  <div class="rating-stars pt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                    <ul id="stars">
+                      <star-rating [rate]="course?.tutor?.ratingAvg"></star-rating>
+                      <span>{{course?.tutor?.ratingAvg}} ({{course?.tutor?.totalRating}})</span>
+                    </ul>
+                  </div>
+                </div>
+                <!-- END tutor name and avatar -->
+                <div class="col-md-6 mt-3" [ngClass]="{'text-left-important': rtl, 'text-right': !rtl}">
+                  <h6><span translate>Last Updated</span> {{course?.updatedAt| date: 'MM/yyyy'}}</h6>
+                  <h6 *ngIf="10<course?.numberOfSold" class="mt-3" [ngClass]="{'text-right': !rtl, 'text-left-important': rtl}">
+                    <img
+                      src="assets/images/webinar/participants.svg"
+                      alt=""
+                      class="image-sm"
+                      [ngClass]="{ 'mr-2': !rtl, 'ml-2': rtl}"
+                    /><span translate>Participants:</span>
+                    {{ course?.numberOfSold }}
+                  </h6>
+                  <h6 class="mt-3">
+                    <span *ngFor="let lang of course?.tutor?.languages, let i  = index"
+                      >{{languageService.returnNameLanguage(lang)}}
+                      <span *ngIf="i < course?.tutor?.languages.length - 1">, </span></span
+                    >
+                  </h6>
+                </div>
+
+              </div>
+              <div class="row mt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                <div class="col-md-12" *ngIf="salePrice<=0 || course.isFree">
+                  <input
+                    style="border: 1.2px solid grey; margin-bottom: 0.5em; height: 3em"
+                    type="email"
+                    class="form-control"
+                    placeholder="{{'Recipient\'s email id' | translate}}"
+                    name="email"
+                    [(ngModel)]="emailRecipient"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    #emailId="ngModel"
+                  />
+                  <div *ngIf="emailId.errors && (emailId.dirty || emailId.touched)">
+                    <p [hidden]="!emailId?.errors.pattern" class="error" translate>Email is invalid format</p>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <button
+                    [disabled]="(currentUser && currentUser._id === course?.tutorId) || emailRecipient === (currentUser && currentUser.email)"
+                    class="btn btn-blue"
+                    [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"
+                    (click)="enrollCourse(course, 'gift')"
+                  >
+                    <i class="fas fa-gift color-white" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>
+                    <span translate>Gift Course</span>
+                  </button>
+
+                  <a class="btn btn-white rmt-3" *ngIf="!course?.isFavorite" (click)="favorite()">
+                    <i class="far fa-heart color-light-red"></i>
+                  </a>
+                  <a class="btn btn-white rmt-3" *ngIf="course?.isFavorite" (click)="unFavorite()">
+                    <i class="fas fa-heart color-light-red"></i>
+                  </a>
+                  <!-- TODO Add price button and buy now  @raouffilali   -->
+
+
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- *Course content -->
+    <div class="row mt-5">
+            <!-- *Price Section -->
+            <div class="col-md-4 mb-5" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+              <div class="card-horizontal card-sticky">
+                <span class="color-light-red price-text" *ngIf="course?.isFree" translate>FREE</span>
+                <span class="color-light-red price-text" *ngIf="appliedCoupon && config?.currencySymbol !=='DZD'">{{salePrice |
+                  currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol' :
+                  '1.0'}}</span>
+                <span class="color-light-red price-text" *ngIf="appliedCoupon && config?.currencySymbol ==='DZD'">{{salePrice |
+                  currency :'DA ' : 'symbol' : '1.0'}} ({{ salePrice / 100 | currency :'$ ' : 'symbol' : '1.0'}})</span>
+                <span class="color-light-red price-text"
+                  *ngIf="!appliedCoupon && !course?.isFree  && config?.currencySymbol !=='DZD'">{{course?.price | currency :
+                  (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol' :
+                  '1.0' }}</span>
+                <span class="color-light-red price-text"
+                  *ngIf="!appliedCoupon && !course?.isFree  && config?.currencySymbol ==='DZD'">{{course?.price | currency :'DA ' :
+                  'symbol' : '1.0'}} ({{ course?.price / 100 | currency :'$ ' : 'symbol' : '1.0'}})</span>
+                <span class="" [ngClass]="{'ml-1': !rtl, 'mr-1': rtl}" *ngIf="appliedCoupon && !course?.isFree"><del>{{course?.price
+                    | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol' :
+                    '1.0' }}</del></span>
+                <span class="offer" [ngClass]="{'ml-1': !rtl, 'mr-1': rtl}"
+                  *ngIf="appliedCoupon&&course?.coupon?.type==='percent'">{{saleValue}}% off</span>
+                <span class="offer" [ngClass]="{'ml-1': !rtl, 'mr-1': rtl}" *ngIf="appliedCoupon&&course?.coupon?.type==='money'">
+                  -${{saleValue}}</span>
+                <p class="color-light-red mt-2"></p>
+                <button [disabled]="(currentUser && currentUser._id === course?.tutorId) || course?.booked" class="btn btn-green"
+                  [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}" (click)="enrollCourse(course, 'booking')"
+                  [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}">
+                  <i class="fas fa-shopping-cart" [ngClass]="{'ml-2':rtl, 'mr-2': !rtl}"></i>
+                  <span *ngIf="!course?.booked" translate>Buy Now</span>
+                  <span *ngIf="course?.booked" translate>Purchased</span>
+                </button>
+                <p class="text-center card-text mt-2 font-xs" translate>30-Day Money-Back Guarantee</p>
+                <h5 class="mt-3" translate>This course includes:</h5>
+                <ul class="p-0 list-unstyled unorder-list">
+                  <li>
+                    <i class="far fa-play-circle font-sm"
+                      [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{returnDurationString(course?.totalLength)}}
+                  </li>
+                  <li>
+                    <i class="fas fa-infinity font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i><span translate>Full lifetime
+                      access</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-mobile-alt font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i><span translate>Access on
+                      mobile and TV</span>
+                  </li>
+                </ul>
+                <div class="cta-input" *ngIf="!course?.booked && currentUser?._id!==tutorId">
+                  <div class="input-group mt-3">
+                    <app-apply-coupon *ngIf="course && course.coupon && course.coupon._id" [options]="optionsCoupon"
+                      (onApply)="applyCoupon($event)" (isUsed)="checkUsedCoupon($event)"></app-apply-coupon>
+                  </div>
+                </div>
+              </div>
+            </div>
+      <div class="col-md-8">
+        <div
+          class="card-horizontal"
+          [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+          *ngIf="course?.goalCourse?.length"
+        >
+          <h4 class="card-title" translate>All the end of my course, students will be able to</h4>
+          <div class="row">
+            <div class="col-md-12">
+              <ul class="p-0 list-unstyled unorder-list term-list list-more-text">
+                <li *ngFor="let item of course?.goalCourse">
+                  <i class="fas fa-check text-success font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{item}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-horizontal mt-5"
+          [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+          *ngIf="course?.whyJoinCourse?.length"
+        >
+          <h4 class="card-title" translate>Who should take this course? Who should not?</h4>
+          <div class="row">
+            <div class="col-md-12">
+              <ul class="p-0 list-unstyled unorder-list term-list list-more-text">
+                <li *ngFor="let item of course?.whyJoinCourse">
+                  <i class="fas fa-check text-success font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{item}}
+                </li>
+                <!-- <div class="more read_more">Read More...</div> -->
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-horizontal mt-5"
+          [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+          *ngIf="course?.needToJoinCourse?.length"
+        >
+          <h4 class="card-title" translate>What will students need to know or do before starting this course?</h4>
+          <div class="row">
+            <div class="col-md-12">
+              <ul class="p-0 list-unstyled unorder-list term-list list-more-text">
+                <li *ngFor="let item of course?.needToJoinCourse">
+                  <i class="fas fa-check text-success font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{item}}
+                </li>
+                <!-- <div class="more read_more">Read More...</div> -->
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-horizontal mt-5" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <h4 *ngIf="myCourse" class="card-title" translate>Progress</h4>
+          <div *ngIf="myCourse" class="mb-3">
+            <ngb-progressbar
+              style="border-radius: 0.25em; font-size: 0.8em"
+              type="primary"
+              [value]="completedPercent"
+              translate
+              >{{completedPercent}}%</ngb-progressbar
+            >
+          </div>
+          <h4 class="card-title" translate>Course content </h4>
+          <p class="card-text font-xs">
+            {{course?.totalSection}} <span translate>sections</span> • {{course?.totalLecture}}
+            <span translate>lectures</span> • {{returnDurationString(course?.totalLength)}}
+            <span translate>total length</span>
+          </p>
+          <div id="accordion" class="myaccordion">
+            <div class="card" *ngFor="let section of sections, let i=index">
+              <div class="card-header" id="headingOne">
+                <h3 class="mb-0">
+                  <button
+                    class="d-flex align-items-center justify-content-between btn btn-link collapsed btn-collapse"
+                    data-toggle="collapse"
+                    [attr.data-target]="'#collapse' + i"
+                    aria-expanded="false"
+                    [attr.aria-controls]="'collapse' + i"
+                  >
+                    {{section.title}}
+                    <p class="mb-0 font-xs font-weight-500">
+                      <span *ngIf="section.lectureIds.length > 1"
+                        >{{section.lectureIds.length}}
+                        <span translate>lectures</span>•{{returnDurationString(section.duration)}}
+                      </span>
+                      <span *ngIf="section.lectureIds.length <= 1"
+                        >{{section.lectureIds.length}}
+                        <span translate>lecture</span>•{{returnDurationString(section.duration)}}
+                      </span>
+                      <span class="fa-stack fa-2x">
+                        <i class="fas fa-plus fa-stack-1x"></i>
+                      </span>
+                    </p>
+                  </button>
+                </h3>
+              </div>
+              <div
+                id="{{'collapse' + i}}"
+                class="collapse"
+                [attr.aria-labelledby]="section._id"
+                data-parent="#accordion"
+              >
+                <div class="card-body">
+                  <a
+                    *ngIf="section?.trialVideo"
+                    href="javascript:void(0)"
+                    (click)="videoTrialVideo(section)"
+                    class="d-flex justify-content-between"
+                  >
+                    <p class="font-xs text-secondary">
+                      <i class="far fa-play-circle mr-2 font-xs"></i>{{section?.title + ' trial video'}}
+                    </p>
+                    <div class="font-xs">
+                      <span class="label label-light-primary">{{returnDuration(section?.trialVideo?.duration)}}</span>
+                    </div>
+                  </a>
+                  <div *ngFor="let lecture of section.lectures, let iLecture = index">
+                    <div *ngIf="!canView">
+                      <div class="d-flex justify-content-between">
+                        <a
+                          class="font-sm js-video-button"
+                          href="javascript:void(0)"
+                          (click)="openLecture(lecture, i, iLecture)"
+                          [ngClass]="{'active':  i === indexSection&&iLecture === indexLecture}"
+                        >
+                          <i class="far fa-filefont-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{lecture?.title}}
+                        </a>
+                        <p class="font-sm text-secondary">{{returnDuration(lecture?.duration)}}</p>
+                      </div>
+
+                      <div class="lecture-media" *ngIf="openLectureId==lecture._id">
+                        <div *ngFor="let media of lecture.medias, let iMedia = index">
+                          <div class="d-flex justify-content-between" *ngIf="media?.mediaType==='video'">
+                            <p class="font-xs text-secondary">
+                              <i class="far fa-play-circle font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                              >{{media?.mediaType}} content-{{iMedia + 1}}
+                            </p>
+                            <div class="font-xs">
+                              <span class="label label-light-warning" translate>video</span>
+                              <span class="label label-light-primary ml-1"
+                                >{{returnDuration(media?.media?.duration)}}</span
+                              >
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between" *ngIf="media?.mediaType==='pdf'">
+                            <p class="font-xs text-secondary">
+                              <i class="far fa-file font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                              >{{media?.mediaType}} content-{{iMedia + 1}}
+                            </p>
+                            <div class="font-xs">
+                              <span class="label label-light-warning" translate>pdf</span>
+                              <span class="label label-light-primary ml-1">{{returnDuration(media?.totalLength)}}</span>
+                            </div>
+                          </div>
+                          <div class="d-flex justify-content-between" *ngIf="media?.mediaType==='audio'">
+                            <p class="font-xs text-secondary">
+                              <i class="far fa-play-circle font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                              >{{media?.mediaType}} content-{{iMedia + 1}}
+                            </p>
+                            <div class="font-xs">
+                              <span class="label label-light-warning" translate>audio</span>
+                              <span class="label label-light-primary ml-1"
+                                >{{returnDuration(media?.media?.duration)}}</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div *ngIf="canView">
+                        <div class="d-flex justify-content-between">
+                          <a
+                            class="font-sm js-video-button"
+                            href="javascript:void(0)"
+                            (click)="openLecture(lecture, i, iLecture)"
+                            [ngClass]="{'active':  i === indexSection&&iLecture === indexLecture}"
+                          >
+                            <i class="far fa-file font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                            >{{lecture?.title}}
+                          </a>
+                          <p class="font-sm text-secondary">{{returnDuration(lecture?.duration)}}</p>
+                        </div>
+                        <div class="lecture-media" *ngIf="openLectureId==lecture._id">
+                          <div *ngFor="let media of lecture.medias, let iMedia = index">
+                            <a
+                              href="javascript:void(0)"
+                              (click)="viewMedia(media, i, iLecture, iMedia)"
+                              [ngClass]="{'active':  i === indexSection&&iLecture === indexLecture&&iMedia===indexMedia}"
+                              class="d-flex justify-content-between"
+                              *ngIf="media?.mediaType==='video'"
+                            >
+                              <p class="font-xs text-secondary">
+                                <i class="far fa-play-circle font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                                >{{media?.media?.name}}
+                              </p>
+                              <div class="font-xs">
+                                <span class="label label-light-warning" translate>video</span>
+                                <span class="label label-light-primary ml-1"
+                                  >{{returnDuration(media?.media?.duration)}}</span
+                                >
+                              </div>
+                            </a>
+                            <a
+                              class="d-flex justify-content-between"
+                              (click)="viewMedia(media, i, iLecture, iMedia)"
+                              [ngClass]="{'active':  i === indexSection&&iLecture === indexLecture&&iMedia===indexMedia}"
+                              class="d-flex justify-content-between"
+                              *ngIf="media?.mediaType==='pdf'"
+                            >
+                              <p class="font-xs text-secondary">
+                                <i class="far fa-file font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                                >{{media?.media?.name}}
+                              </p>
+                              <div class="font-xs">
+                                <span class="label label-light-warning" translate>pdf</span>
+                                <span class="label label-light-primary ml-1"
+                                  >{{returnDuration(media?.totalLength)}}</span
+                                >
+                              </div>
+                            </a>
+                            <a
+                              class="d-flex justify-content-between"
+                              (click)="viewMedia(media, i, iLecture, iMedia)"
+                              [ngClass]="{'active':  i === indexSection&&iLecture === indexLecture&&iMedia===indexMedia}"
+                              class="d-flex justify-content-between"
+                              *ngIf="media?.mediaType==='audio'"
+                            >
+                              <p class="font-xs text-secondary">
+                                <i class="far fa-play-circle font-xs" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i
+                                >{{media?.media?.name}}
+                              </p>
+                              <div class="font-xs">
+                                <span class="label label-light-warning" translate>audio</span>
+                                <span class="label label-light-primary ml-1"
+                                  >{{returnDuration(media?.media?.duration)}}</span
+                                >
+                              </div>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-horizontal mt-5" *ngIf="enrolledList?.length">
+          <h4 class="card-title" translate>List of students who have enrolled for this course</h4>
+          <ul class="students-enrolled mt-4" *ngIf="enrolledList?.length">
+            <li *ngFor="let item of enrolledList" placement="bottom" ngbTooltip="{{item?.user?.name}}">
+              <img src="{{item?.user?.avatarUrl}}" onerror="this.src='/assets/images/no-image.jpg'" alt="" />
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+   <!-- *Description -->
+    <div class="row mt-5" *ngIf="course.description" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+            <div class="col-md-12">
+              <h4 class="card-title" translate>Description</h4>
+              <app-card-text [content]="course.description" [showChar]="2000"></app-card-text>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- *Last section  -->
+    <div class="row mt-5">
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+            <div class="col-md-6" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+              <h3 class="mb-4" translate>Instructor</h3>
+              <div class="profile">
+                <a [routerLink]="['/tutors', course?.tutor?.username]">
+                  <img
+                    src="{{course?.tutor?.avatarUrl | defaultImage}}"
+                    class="profile-md box-shadow-lg"
+                    alt=""
+                    [ngClass]="{'float-left': !rtl, 'float-right': rtl}"
+                  />
+                  <div class="pt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl, 'pl-10': !rtl, 'pr-10': rtl}">
+                    <h5 class="profile-name">
+                      {{course?.tutor?.name}}<i class="fas fa-check-circle color-blue ml-2"></i>
+                    </h5>
+                  </div>
+                </a>
+              </div>
+              <div class="pt-70">
+                <h4 class="card-title" translate>About Me</h4>
+                <app-card-text [content]="course?.tutor?.bio" [showChar]="500"></app-card-text>
+              </div>
+            </div>
+            <div class="col-md-6 rmt-4">
+              <review-list
+                [options]="optionsReview"
+                [stats]="statsReview"
+                [canWriteReview]="canView"
+                [rtl]="rtl"
+              ></review-list>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

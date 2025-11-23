@@ -1,0 +1,87 @@
+<section class="sm-padding">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-md-12 col-lg-12 col-sm-12 text-center">
+        <h2 class="color-light-black" translate>Our Approved Teachers</h2>
+        <p class="sub-title mt-2" translate>This is list tutor</p>
+      </div>
+    </div>
+    <div class="row mb-4">
+      <div
+        class="col-md-12 d-flex justify-content-between rd-block"
+        [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+        style="align-items: flex-end"
+      >
+        <div class="form-group rmr-0" [ngClass]="{ 'mr-3': !rtl}">
+          <label class="font-weight-bold font-sm" translate>Grades</label>
+          <grade-tutor [grades]="grades" (afterChange)="gradeChange($event)"></grade-tutor>
+        </div>
+        <div class="form-group mr-3 rmr-0">
+          <label class="font-weight-bold font-sm" translate>Filter By Categories</label>
+          <select class="custom-select" [(ngModel)]="searchFields.categoryIds" (change)="selectCategory()">
+            <option selected translate value="">None</option>
+            <option *ngFor="let cate of categories" translate value="{{cate._id}}" translate>{{cate.name}}</option>
+          </select>
+        </div>
+        <div class="form-group mr-3 rmr-0">
+          <label class="font-weight-bold font-sm" translate>Filter By Subjects</label>
+          <select class="custom-select" [(ngModel)]="searchFields.subjectIds" (change)="selectSubject()">
+            <option selected translate value="">None</option>
+            <option *ngFor="let sub of subjects" translate value="{{sub._id}}" translate>{{sub.name}}</option>
+          </select>
+        </div>
+        <div class="form-group mr-3 rmr-0">
+          <label class="font-weight-bold font-sm" translate>Filter By Topics</label>
+          <select class="custom-select" [(ngModel)]="searchFields.topicIds" (change)="query()">
+            <option selected translate value="">None</option>
+            <option *ngFor="let topic of topics" translate value="{{topic._id}}" translate>{{topic.name}}</option>
+          </select>
+        </div>
+        <div class="form-group mr-3 rmr-0">
+          <label class="font-weight-bold font-sm" translate>Availability</label>
+          <date-range (dateChange)="dateChangeEvent($event)"></date-range>
+        </div>
+        <div class="form-group rmr-0 mt-2 more-filer" [ngClass]="{ 'mr-3': rtl}">
+          <button class="btn btn-blue btn-show-more" (click)="showMore()">
+            <i class="fas fa-filter" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i> <span translate>More</span>
+          </button>
+          <div *ngIf="showMoreFilter" class="filter">
+            <div class="form-group mt-2">
+              <label class="font-weight-bold font-sm" translate>Countries</label>
+              <select class="custom-select" [(ngModel)]="searchFields.countryCode">
+                <option selected translate value="">Country</option>
+                <option *ngFor="let item of countries" value="{{item.code}}">{{item.name}}</option>
+              </select>
+            </div>
+            <button class="btn btn-blue mt-2" (click)="apply()"><span translate>Apply</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4">
+      <div class="col-md-12" *ngIf="loading" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <p class="">
+          <strong><span translate>Loading</span>...</strong>
+        </p>
+      </div>
+      <div class="col-md-12" [hidden]="loading || tutors.length" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <p class="font-weight-bold" translate>No results</p>
+      </div>
+      <tutor-card [rtl]="rtl" class="col mb-4" *ngFor="let item of tutors" [tutor]="item"></tutor-card>
+    </div>
+    <div class="row mt-5" *ngIf="total>pageSize">
+      <div class="col-md-12 text-center">
+        <ngb-pagination
+          [collectionSize]="total"
+          [(page)]="page"
+          [pageSize]="pageSize"
+          [maxSize]="5"
+          (pageChange)="pageChange()"
+          class="card-pagination pagination"
+          *ngIf="total>0"
+        >
+        </ngb-pagination>
+      </div>
+    </div>
+  </div>
+</section>

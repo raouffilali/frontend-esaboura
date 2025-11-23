@@ -1,0 +1,123 @@
+<div class="modal-header">
+  <h2 class="modal-title" translate>Q&A</h2>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div *ngFor="let q of questions, let i=index">
+    <div class="d-flex justify-content-between align-items-baseline">
+      <h6 class="question">{{q.content}}</h6>
+      <div class="d-flex">
+        <button type="button" class="btn btn-danger mr-1" *ngIf="q.checking" (click)="viewAnswer(q)" translate>
+          View answer
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitAnswer(q)" translate>Submit</button>
+      </div>
+    </div>
+    <div *ngIf="(q.type==='trueOrFalse'|| q.type==='single')">
+      <div *ngIf="!q.viewAnswer">
+        <div *ngFor="let a of q.answers, let i_a=index">
+          <label>
+            <input type="radio" [name]="q._id" (click)="checkAnswer(q,a)" [checked]="q.checkedAnswerId==a._id" />
+            <span class="ml-3">{{a.content}}</span>
+          </label>
+        </div>
+        <p class="correct" *ngIf="q.correct" translate>Correct!</p>
+        <p class="incorrect" *ngIf="!q.correct && q.checking" translate>Incorrect!</p>
+      </div>
+      <div *ngIf="q.viewAnswer">
+        <div *ngFor="let a of q.answers, let i_a=index">
+          <label>
+            <input type="radio" [name]="q._id" [checked]="a.isCorrect" />
+            <span class="ml-3" [ngClass]="{'correct': a.isCorrect}">{{a.content}}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="q.type==='multi'">
+      <div *ngIf="!q.viewAnswer">
+        <div class="d-flex align-items-baseline" *ngFor="let a of q.answers, let i_a=index">
+          <label>
+            <input
+              type="radio"
+              [name]="a._id"
+              (click)="checkAnswer(q,a)"
+              [checked]="q?.checkedAnswerIds?.includes(a._id)"
+            />
+            <span class="ml-3">{{a.content}}</span>
+          </label>
+          <p class="correct ml-3" *ngIf="q?.checkedAnswerIds?.includes(a._id) && q.checking && a.isCorrect" translate>
+            Correct!
+          </p>
+          <p
+            class="incorrect ml-3"
+            *ngIf="q?.checkedAnswerIds?.includes(a._id) && q.checking && !a.isCorrect"
+            translate
+          >
+            Incorrect!
+          </p>
+        </div>
+      </div>
+      <div *ngIf="q.viewAnswer">
+        <div class="d-flex align-items-baseline" *ngFor="let a of q.answers, let i_a=index">
+          <label>
+            <input type="radio" [name]="a._id" [checked]="a.isCorrect" />
+            <span class="ml-3" [ngClass]="{'correct': a.isCorrect}">{{a.content}}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="q.type==='matching'">
+      <div class="row" style="padding: 2em">
+        <div class="col-md-6 custom-border mt-3 word-wrap">
+          <h6 class="text-center" translate>Column A</h6>
+          <hr />
+          <div class="d-flex justify-content-between" *ngFor="let item of q.answers, let i_a=index">
+            <div *ngIf="item.isColumnA" style="padding: 1em">
+              <div><b>{{item.label}}.</b><span> {{item.content}}</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 custom-border mt-3 word-wrap">
+          <h6 class="text-center" translate>Column B</h6>
+          <hr />
+          <div class="d-flex justify-content-between" *ngFor="let item of q.answers, let i_a=index">
+            <div *ngIf="!item.isColumnA" style="padding: 1em">
+              <div><b>{{item.label}}.</b><span> {{item.content}}</span></div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="col-md-3 mt-3 d-flex justify-content-between align-items-baseline"
+          *ngFor="let item of q.columnAAnswers, let i=index"
+        >
+          <div *ngIf="!q.viewAnswer">
+            <span class="mr-1"><b>{{item.label}}</b> </span> <span class="mr-1" translate>matchs</span>
+            <select
+              style="min-width: 100px"
+              [name]="item._id"
+              class="custom-border"
+              #matching="ngModel"
+              [(ngModel)]="item.checkedMatchingAnswerId"
+            >
+              <option *ngFor="let _item of q.columnBAnswers" [value]="_item._id">{{_item.label}}</option>
+            </select>
+            <p class="correct" *ngIf="q.checking && item.isCorrect" translet>Correct!</p>
+            <p class="incorrect" *ngIf="q.checking && !item.isCorrect" translet>Incorrect!</p>
+          </div>
+        </div>
+
+        <div *ngIf="q.viewAnswer">
+          <div
+            class="mt-3 d-flex justify-content-between align-items-baseline correct"
+            *ngFor="let item of q.columnAAnswers, let i=index"
+          >
+            <span class="mr-1"><b>{{item.label}}</b> </span> <span class="mr-1" translate>matchs</span>
+            <span><b>{{item.matchingAnswer.label}}</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

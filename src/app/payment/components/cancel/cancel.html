@@ -1,0 +1,19 @@
+
+<!-- *ngIf="this.satimFailOrderId" -->
+<div class="alert alert-danger alert-dismissible fade show text-center" *ngIf="this.satimFailOrderId" translate>
+  <span translate> {{this.errorMsg}} </span>
+</div> 
+<div class="col-md-12 text-center" *ngIf="this.satimFailOrderId" >        
+  <h6 class="color-light-red" translate>
+    <span translate>In case of payment problem, please contact the toll free number of SATIM 3020 </span> 
+    <img src="/assets/images/3020.png" alt="" class="image-md"  />
+  </h6>
+</div>
+<div class="col-md-12 text-center" *ngIf="this.satimFailOrderId" >  
+<button class="btn btn-default mt-3 hide-print" [routerLink]="'/users/transaction/list'" translate>Go to your transactions page</button>
+<p></p>
+</div>
+<!-- Fin *ngIf="this.satimFailOrderId" -->
+<div class="color-light-red mt-3 text-center alert" role="alert" *ngIf="!this.satimFailOrderId" >
+  <h6><span style="color: red;" translate>Payment cancel! will redirect in </span> <strong class="label label-light-danger">{{second}}s</strong></h6>
+</div>

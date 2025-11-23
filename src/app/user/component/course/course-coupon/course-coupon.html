@@ -1,0 +1,186 @@
+<div class="card-horizontal input-border">
+  <form (submit)="submit(frm)" #frm="ngForm" class="coupon-form" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label translate>Name</label>
+          <input
+            type="text"
+            name="name"
+            class="form-control"
+            placeholder="{{'Enter name'|translate}}"
+            [(ngModel)]="coupon.name"
+            required
+            #name="ngModel"
+          />
+          <div *ngIf="name.errors && (name.dirty || name.touched || isSubmitted)">
+            <p [hidden]="!name.errors.required" style="color: red" translate>Please enter coupon name!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label translate>Coupon Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="code"
+            placeholder="{{'Enter coupon'|translate}}"
+            [(ngModel)]="coupon.code"
+            required
+            #codeCoupon="ngModel"
+            pattern="[a-zA-Z0-9-_%]*"
+          />
+        </div>
+        <div *ngIf="codeCoupon.errors && (codeCoupon.dirty || codeCoupon.touched || isSubmitted)">
+          <p [hidden]="!codeCoupon.errors.required" style="color: red" translate>Please enter coupon code!</p>
+          <p [hidden]="!codeCoupon.errors.pattern" class="error" style="color: red" translate>Code is invalid format</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label translate>Maximun number of people who can use coupon</label>
+          <input
+            type="number"
+            class="form-control"
+            name="maximum"
+            placeholder="{{'Enter number'|translate}}"
+            [(ngModel)]="coupon.limitNumberOfUse"
+            required
+            #maximum="ngModel"
+            min="0"
+            pattern="[0-9]*"
+          />
+        </div>
+        <div *ngIf="maximum.errors && (maximum.dirty || maximum.touched || isSubmitted)">
+          <p [hidden]="!maximum.errors.required" style="color: red" translate>Please enter value !</p>
+          <p [hidden]="!maximum.errors.pattern" class="error" style="color: red" translate>Value is invalid format</p>
+        </div>
+        <div *ngIf="maximum.value <= 0 && (maximum.dirty || maximum.touched || isSubmitted)">
+          <p style="color: red" translate>Value must be greater than 0!</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="" translate>Start Date</label>
+          <div class="input-group-append">
+            <input
+              class="form-control"
+              placeholder="{{'dd-mm-yyyy'|translate}}"
+              name="startTime"
+              [(ngModel)]="time.startTime"
+              ngbDatepicker
+              #b="ngbDatepicker"
+              (ngModelChange)="selectDate($event, 'startTime')"
+              #start="ngModel"
+              required
+              [minDate]="{year: currentYear, month: 1, day: 1}"
+            />
+            <button class="btn btn-outline-secondary calendar" (click)="b.toggle()" type="button">
+              <i class="fa fa-calendar"></i>
+            </button>
+          </div>
+          <div *ngIf="!coupon.startTime && (start.dirty || start.touched || isSubmitted)">
+            <p style="color: red" translate>Please enter start date!</p>
+          </div>
+          <div *ngIf="validTime['startTime']">
+            <p style="color: red" translate>Please enter valid date!</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="" translate>End Date</label>
+          <div class="input-group-append">
+            <input
+              class="form-control"
+              placeholder="{{'dd-mm-yyyy'|translate}}"
+              name="expiredDate"
+              [(ngModel)]="time.expiredDate"
+              ngbDatepicker
+              #a="ngbDatepicker"
+              (ngModelChange)="selectDate($event, 'expiredDate')"
+              #expire="ngModel"
+              required
+              [minDate]="{year: currentYear, month: 1, day: 1}"
+            />
+            <button class="btn btn-outline-secondary calendar" (click)="a.toggle()" type="button">
+              <i class="fa fa-calendar"></i>
+            </button>
+          </div>
+          <div *ngIf="!coupon.expiredDate && (expire.dirty || expire.touched || isSubmitted)">
+            <p style="color: red" translate>Please enter expired date!</p>
+          </div>
+          <div *ngIf="validTime['expiredDate']">
+            <p style="color: red" translate>Please enter valid date!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="mt-3">
+          <label class="custom-radio" translate
+            >Money Discount %
+            <input type="radio" (click)="percentage()" checked="checked" name="discount" value="percent" />
+            <span class="checkmark"></span>
+          </label>
+          <label class="custom-radio" translate
+            >Money Discount ({{config?.currencySymbol ? config?.currencySymbol : '$'}})
+            <input type="radio" (click)="usd()" name="discount" value="money" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-6">
+        <div class="form-group">
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Enter discount"
+            [(ngModel)]="coupon.value"
+            required
+            #value="ngModel"
+            pattern="[.0-9]{0,8}"
+            name="discount"
+          />
+        </div>
+        <div *ngIf="value.errors && (value.dirty || value.touched || isSubmitted)">
+          <p [hidden]="!value.errors.required" style="color: red" translate>Please enter discount value!</p>
+          <p [hidden]="!value.errors.pattern" class="error" style="color: red" translate>Value is invalid format</p>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-12">
+      <div class="form-group">
+        <button name="submit" type="submit" class="btn btn-default mt-4" translate>Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+<ul class="list-inline" [ngClass]="{'float-right':!rtl, 'float-left': rtl}">
+  <li>
+    <button type="button" class="btn btn-light prev-step" [ngClass]="{'mr-2':!rtl, 'ml-2': rtl}" (click)="onTab(3)">
+      <i
+        class="fas wizard-arrow"
+        [ngClass]="{'fa-angle-double-left  mr-1': !rtl, 'fa-angle-double-right ml-1': rtl}"
+      ></i
+      ><span translate>Previous</span>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="btn btn-default next-step" [routerLink]="['/users/courses']">
+      <span translate>Finish</span
+      ><i
+        class="fas wizard-arrow"
+        [ngClass]="{'fa-angle-double-right ml-1 ': !rtl, 'fa-angle-double-left mr-1': rtl}"
+      ></i>
+    </button>
+  </li>
+</ul>

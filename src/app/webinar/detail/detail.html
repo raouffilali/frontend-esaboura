@@ -1,0 +1,309 @@
+<section class="pt-5 pb-5">
+  <div class="container" *ngIf="webinar">
+    <div class="row">
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="img-square-wrapper mt-2">
+                <img
+                  src="{{webinar?.mainImage?.fileUrl}}"
+                  alt=""
+                  class="border-radius-default object-fit-cover h-350"
+                />
+              </div>
+            </div>
+            <div class="col-md-6 rmt-3">
+              <h4 class="font-weight-bold" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">{{webinar.name}}</h4>
+              <div class="mb-3" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                <a
+                  *ngFor="let cat of webinar.categories; let i = index"
+                  [routerLink]="['/categories']"
+                  [queryParams]="{ categoryIds: cat._id }"
+                  ><span class="badge badge-default mr-2">{{ cat.name }}</span></a
+                >
+              </div>
+              <div class="row row-cols-md-1 row-cols-lg-2">
+                <div class="col-md-6">
+                  <div class="profile">
+                    <a [routerLink]="['/tutors', webinar?.tutor?.username]">
+                      <img
+                        src="{{webinar?.tutor?.avatarUrl | defaultImage}}"
+                        class="cate-profile-sm box-shadow-lg"
+                        alt=""
+                        [ngClass]="{'float-left mr-2': !rtl, 'float-right ml-2': rtl}"
+                      />
+                      <h5 class="pt-3 font-sm" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                        {{webinar?.tutor?.name}}
+                      </h5>
+                    </a>
+                  </div>
+                  <div class="rating-stars pt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                    <star-rating [rate]="webinar?.tutor?.ratingAvg"></star-rating> {{webinar?.tutor?.ratingAvg}}
+                    ({{webinar?.tutor?.totalRating}})
+                  </div>
+                  <h4 class="color-light-red price-text" *ngIf="!webinar.price || webinar?.isFree" translate>FREE</h4>
+
+                  <h4
+                    class="color-light-red mt-3"
+                    *ngIf="!appliedCoupon && webinar.price && webinar.price > 0"
+                    [ngClass]="{ 'text-left': !rtl, 'text-right': rtl}"
+                  >
+                    <strong *ngIf="config?.currencySymbol !=='DZD'"
+                      >{{ webinar?.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '):
+                      'symbol' : '1.0'}}</strong
+                    >
+                    <strong *ngIf="config?.currencySymbol ==='DZD'"
+                      >{{ webinar?.price | currency :'DA ' : 'symbol' : '1.0'}} ({{ webinar?.price / 100 | currency :'$ ' : 'symbol' : '1.0'}})</strong
+                    >
+                  </h4>
+                  <h4 class="color-light-red mt-3" *ngIf="appliedCoupon && config?.currencySymbol !=='DZD'">
+                    <small class="text-line-through mr-1"
+                      >{{ webinar?.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '):
+                      'symbol' : '1.0' }}</small
+                    >
+                    <strong
+                      >{{salePrice | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol'
+                      : '1.0'}}</strong
+                    >
+                  </h4>
+                  <h4 class="color-light-red mt-3" *ngIf="appliedCoupon && config?.currencySymbol ==='DZD'">
+                    <small class="text-line-through mr-1"
+                      >{{ salePrice | currency :'DA ' : 'symbol' : '1.0'}} ({{ salePrice / 100 | currency :'$ ' : 'symbol' : '1.0'}})</small
+                    >
+                    <strong
+                      >{{salePrice | currency :'DA ' : 'symbol' : '1.0'}} ({{ salePrice / 100 | currency :'$ ' : 'symbol' : '1.0'}})</strong
+                    >
+                  </h4>
+                </div>
+                <div class="col-md-6 mt-2">
+                  <p
+                    *ngIf="10<webinar?.numberParticipants"
+                    class="card-text"
+                    [ngClass]="{'text-right': !rtl, 'text-left-important': rtl}"
+                  >
+                    <img
+                      src="assets/images/webinar/participants.svg"
+                      alt=""
+                      class="image-sm"
+                      [ngClass]="{ 'mr-2': !rtl, 'ml-2': rtl}"
+                    /><span translate>Participants:</span>
+                    {{ webinar?.numberParticipants }}
+                  </p>
+                  <!-- <p class="card-text mt-4" [ngClass]="{'text-left-important': rtl, 'text-right': !rtl}">
+                    <img
+                      src="assets/images/webinar/certified-img.svg"
+                      alt=""
+                      class="image-sm"
+                      [ngClass]="{ 'mr-2': !rtl, 'ml-2': rtl}"
+                      translate
+                    />
+                    <span translate [ngClass]="{'text-left': !rtl, 'text-right': rtl}">Completed By Learners </span>
+                  </p> -->
+                  <p class="card-text mt-4" [ngClass]="{'text-left-important': rtl, 'text-right': !rtl}">
+                    <img
+                      src="assets/images/webinar/clock.png"
+                      alt=""
+                      class="image-sm"
+                      [ngClass]="{ 'mr-2': !rtl, 'ml-2': rtl}"
+                    /><span translate>{{slotLeft}} </span><span translate *ngIf="1<slotLeft"> Slots left </span>
+                    <span translate *ngIf="1>=slotLeft"> Slot left </span>
+                  </p>
+                </div>
+              </div>
+              <div class="row mt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                <div class="col-md-12">
+                  <app-apply-coupon
+                    *ngIf="webinar && webinar.coupon && webinar.coupon._id"
+                    [options]="optionsCoupon"
+                    [rtl]="rtl"
+                    (onApply)="applyCoupon($event)"
+                    (isUsed)="checkUsedCoupon($event)"
+                  ></app-apply-coupon>
+                </div>
+
+                <div class="col-md-12" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                  <button
+                    [disabled]="webinar.numberParticipants >= webinar.maximumStrength || !canBooking || (currentUser && currentUser._id === webinar.tutorId) || booked"
+                    class="btn btn-green mr-2"
+                    (click)="enrollWebinar(webinar, 'booking')"
+                  >
+                    <i class="far fa-paper-plane color-white mr-2">&nbsp;</i>
+                    <span *ngIf="!booked" translate>Book Now</span>
+                    <span *ngIf="booked" translate>Purchased</span>
+                  </button>
+                  <button
+                    *ngIf="salePrice>0"
+                    [disabled]="webinar.numberParticipants >= webinar.maximumStrength || !canBooking || (currentUser && currentUser._id === webinar.tutorId) || emailRecipient === (currentUser && currentUser.email)"
+                    class="btn btn-blue mr-2"
+                    (click)="enrollWebinar(webinar, 'gift')"
+                  >
+                    <i class="fas fa-gift color-white mr-2">&nbsp;</i>
+                    <span translate>Gift Group Class</span>
+                  </button>
+                  <a
+                    class="btn btn-white rmt-3"
+                    *ngIf="!webinar?.isFavorite"
+                    (click)="favorite()"
+                    [ngClass]="{'mr-2': rtl}"
+                  >
+                    <i class="far fa-heart color-light-red"></i>
+                  </a>
+                  <a
+                    class="btn btn-white rmt-3"
+                    *ngIf="webinar?.isFavorite"
+                    (click)="unFavorite()"
+                    [ngClass]="{'mr-2': rtl}"
+                  >
+                    <i class="fas fa-heart color-light-red"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="row" *ngIf="salePrice<=0">
+                <div class="col-md5">
+                  <button
+                    style="margin-top: 0.5em"
+                    [disabled]="webinar.numberParticipants >= webinar.maximumStrength || !canBooking || (currentUser && currentUser._id === webinar.tutorId) || emailRecipient === (currentUser && currentUser.email)"
+                    class="btn btn-blue mr-2"
+                    (click)="enrollWebinar(webinar, 'gift')"
+                  >
+                    <i class="fas fa-gift color-white mr-2"></i>
+                    <span translate>Gift Group Class</span>
+                  </button>
+                </div>
+                <div class="col-md-7">
+                  <input
+                    style="border: 1.2px solid grey; margin-top: 0.5em; height: 3.2em"
+                    type="email"
+                    class="form-control"
+                    placeholder="{{'Recipient\'s email id' | translate}}"
+                    name="email"
+                    [(ngModel)]="emailRecipient"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+                    #emailId="ngModel"
+                  />
+                  <div *ngIf="emailId.errors && (emailId.dirty || emailId.touched)">
+                    <p [hidden]="!emailId?.errors.pattern" class="error" translate>Email is invalid format</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-12 col-12 col-lg-12" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <div class="card-horizontal">
+          <div class="row" *ngIf="isShowSlot && slotChunks.length <= 2">
+            <div class="col-md-6 col-item-chunk" *ngFor="let slotChunk of slotChunks">
+              <div class="rmb-3 mb-5" *ngFor="let item of slotChunk">
+                <span class="sub-text" [ngClass]="{ 'mr-2': !rtl, 'ml-2': rtl}"
+                  >{{item.startTime | date: 'dd/MM/yyyy'}}, {{item.startTime | date: 'h:mma'}} - {{item.toTime | date:
+                  'h:mma'}}</span
+                ><span class="badge badge-primary" *ngIf="!item.disable" translate>Upcoming Slots</span>
+                <span class="badge badge-secondary" *ngIf="item.disable" translate>Expired Slots</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="row position-relative"
+            [ngClass]="{'hidden-150': isShowSlot && isHidden}"
+            *ngIf="isShowSlot && slotChunks.length > 2"
+          >
+            <div class="col-md-6 col-item-chunk" *ngFor="let slotChunk of slotChunks">
+              <div class="rmb-3 mb-5" *ngFor="let item of slotChunk">
+                <span class="sub-text mr-2"
+                  >{{item.startTime | date: 'dd/MM/yyyy'}}, {{item.startTime | date: 'h:mma'}} - {{item.toTime | date:
+                  'h:mma'}}</span
+                ><span class="badge badge-primary" *ngIf="!item.disable" translate>Upcoming Slots</span>
+                <span class="badge badge-secondary" *ngIf="item.disable" translate>Expired Slots</span>
+              </div>
+            </div>
+            <div class="col-md-12 position-absolute bottom-0">
+              <a href="javascript:void(0)" class="morelink" (click)="isHidden = false" *ngIf="isHidden"
+                ><span translate>Read More</span>...</a
+              >
+              <a href="javascript:void(0)" class="morelink" (click)="isHidden = true" *ngIf="!isHidden"
+                >...<span translate>Read Less</span></a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-5" *ngIf="webinar.description" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+            <div class="col-md-12">
+              <h4 class="card-title" translate>Description</h4>
+              <app-card-text [content]="webinar.description" [showChar]="500"></app-card-text>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-12 col-12 col-lg-12">
+        <div class="card-horizontal">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="profile">
+                <a [routerLink]="['/tutors', webinar?.tutor?.username]">
+                  <img
+                    src="{{webinar?.tutor?.avatarUrl | defaultImage}}"
+                    class="profile-md box-shadow-lg"
+                    alt=""
+                    [ngClass]="{'float-left': !rtl, 'float-right': rtl}"
+                  />
+                  <div class="pt-4" [ngClass]="{'text-left': !rtl, 'text-right': rtl, 'pl-10': !rtl, 'pr-10': rtl}">
+                    <h5 class="profile-name">
+                      {{webinar?.tutor?.name }}<i
+                        class="fas fa-check-circle color-blue"
+                        [ngClass]="{'ml-2': !rtl, 'mr-2': rtl}"
+                      ></i>
+                    </h5>
+                  </div>
+                </a>
+
+                <div>
+                  <div
+                    class="img-flag-tutor"
+                    [ngClass]="{'float-left': !rtl, 'float-right': rtl, 'ml-2': !rtl, 'mr-2': rtl}"
+                  >
+                    <img
+                      src="{{webinar?.tutor?.country?.flag}}"
+                      alt=""
+                      class="image-sm"
+                      [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"
+                    />
+                  </div>
+                  <h5
+                    style="display: inline-block"
+                    [ngClass]="{'float-left': !rtl, 'float-right': rtl, 'ml-2': !rtl, 'mr-2': rtl}"
+                    translate
+                  >
+                    {{webinar?.tutor?.country?.name}}
+                  </h5>
+                </div>
+              </div>
+              <div class="pt-70" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                <h4 class="card-title" translate>About Me</h4>
+                <app-card-text [content]="webinar?.tutor?.bio" [showChar]="500"></app-card-text>
+              </div>
+            </div>
+            <div class="col-md-6 rmt-4">
+              <review-list
+                [options]="optionsReview"
+                [stats]="statsReview"
+                [canWriteReview]="false"
+                [rtl]="rtl"
+              ></review-list>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

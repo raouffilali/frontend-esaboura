@@ -1,0 +1,81 @@
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Barcode+39+Text&family=Cairo&family=Cinzel&family=Playfair+Display+SC&family=Staatliches&family=Cinzel+Decorative:wght@400;700;900&family=Oswald:wght@200;300;400;700&display=swap" rel="stylesheet" crossorigin="anonymous">
+<!-- Ana  this link saved me the fonts didn't worked so i added the above link  -->
+<!-- solution link: https://github.com/tsayen/dom-to-image/issues/279 -->
+<div class="modal-header">
+  <h2 style="font-size: 2em" class="modal-title" translate>Your course cerificate</h2>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" *ngIf="stringDuration" id="course-certificate">
+  <div class="pm-certificate-container">
+    <div class="outer-border"></div>
+
+    <div class="inner-border"></div>
+
+    <div class="pm-certificate-border col-md-12">
+      <div class="bg-image">
+        <div class="row pm-certificate-header">
+          <div class="pm-certificate-title cursive col-md-12 text-center">
+            <h2>Certificate of Completion</h2>
+          </div>
+        </div>
+
+        <div class="row pm-certificate-body">
+          <div class="pm-certificate-block">
+            <center>
+              <span class="pm-earned-text padding-0 block cursive"><i>This is to certify that</i></span>
+            </center>
+
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-2"><!-- LEAVE EMPTY --></div>
+                <div class="pm-certificate-name underline margin-0 col-md-8 text-center">
+                  <span class="pm-name-text bold">{{userName}}</span>
+                </div>
+                <div class="col-md-2"><!-- LEAVE EMPTY --></div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-2"><!-- LEAVE EMPTY --></div>
+                <div class="col-md-8 text-center">
+                  <span class="pm-earned-text block cursive"><i>has completed a course training entitled</i></span>
+                  <span class="pm-course-title underline block bold sans">{{myCourse?.name}}</span>
+                </div>
+
+                <div class="col-md-2"><!-- LEAVE EMPTY --></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row pm-certificate-footer justify-content-between">
+            <!-- <div class="pm-certificate-footer"> -->
+            <div class="pm-certified text-center">
+              <span class="pm-credits-text block sans underline"
+                >Tutor: <strong>{{myCourse?.course?.tutor?.name}}</strong></span
+              >
+              <!-- <span class="pm-empty-space block underline"></span> -->
+              <span class="pm-barcode-text">{{myCourse?.userId}}</span>
+            </div>
+            <div class="col-md-2 img-stamp">
+              <!-- LEAVE EMPTY -->
+              
+            </div>
+            <div class="pm-certified text-center">
+              <span class="pm-date-text block sans underline">{{myCourse?.completedAt|date:'longDate'}}</span>
+              <!-- <span class="pm-empty-space block underline"></span> -->
+              <!-- <span class="bold block">DOB: </span> -->
+              <span class="bold block"><span class="pm-date-number">#{{myCourse?.transactionId}}</span></span>
+            </div>
+        </div>
+        <!-- </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button translate (click)="exportAsPDF('course-certificate')" class="btn btn-default mr-5">Save as PDF</button>
+</div>

@@ -1,0 +1,88 @@
+<div class="card-horizontal input-border">
+  <div class="row mb-3">
+    <div class="col-md-3 d-flex align-items-center">
+      <button class="btn btn-green mt-2" (click)="submitSection()" translate>Add Section</button>
+    </div>
+  </div>
+  <div id="accordion" class="row mb-3 myaccordion" *ngIf="sections.length && !loading">
+    <div class="card col-md-12" *ngFor="let section of sections, let i = index">
+      <div class="card-header" id="{{section._id}}">
+        <div class="row">
+          <div class="col-md-11">
+            <h3 class="mb-0">
+              <button
+                class="d-flex align-items-center justify-content-between btn btn-link collapsed btn-collapse"
+                data-toggle="collapse"
+                [attr.data-target]="'#collapse' + i"
+                aria-expanded="false"
+                [attr.aria-controls]="'collapse' + i"
+              >
+                {{section.title}}
+                <p class="mb-0 font-xs font-weight-500">
+                  <span *ngIf="section.totalLecture > 1"
+                    >{{section.totalLecture}} <span translate>lectures</span>•</span
+                  >
+                  <span *ngIf="section.totalLecture <=1">{{section.totalLecture}} <span translate>lecture</span>•</span>
+                  <span class="fa-stack fa-2x">
+                    <i class="fas fa-plus fa-stack-1x"></i>
+                  </span>
+                </p>
+              </button>
+            </h3>
+          </div>
+          <div class="col-md-1">
+            <a (click)="submitSection(section)" [ngClass]="{'mr-1': !rtl, 'ml-1': rtl}"
+              ><i class="fa fa-edit text-success font-sm"></i
+            ></a>
+            <a (click)="removeSection(section, i)"><i class="fa fa-trash text-danger font-sm"></i></a>
+          </div>
+        </div>
+      </div>
+      <div id="{{'collapse' + i}}" class="collapse" [attr.aria-labelledby]="section._id" data-parent="#accordion">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <button class="btn btn-green" (click)="submitLecture(i, section._id, courseId)" translate>
+              Add Lecture
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between" *ngFor="let lecture of section.lectures, let iLecture = index">
+            <a class="font-sm js-video-button" href="javascript:void(0)"
+              ><i class="far fa-file font-sm" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}"></i>{{lecture?.title}}</a
+            >
+
+            <div [ngClass]="{'mr-3': !rtl, 'ml-3': rtl}">
+              <a (click)="submitLecture(i, section._id, courseId, lecture)"
+                ><i class="fa fa-edit text-success font-sm"></i
+              ></a>
+              <a (click)="removeLecture(i, lecture, iLecture)"><i class="fa fa-trash text-danger font-sm"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ul class="list-inline" [ngClass]="{'float-right':!rtl, 'float-left': rtl}">
+  <li>
+    <button type="button" class="btn btn-light prev-step" [ngClass]="{'mr-2': !rtl, 'ml-2': rtl}" (click)="onTab(2)">
+      <i
+        [ngClass]="{'mr-1': !rtl, 'ml-1': rtl}"
+        class="fas wizard-arrow"
+        [ngClass]="{'fa-angle-double-left': !rtl, 'fa-angle-double-right': rtl}"
+      ></i
+      ><span translate>Previous</span>
+    </button>
+  </li>
+  <li>
+    <button type="button " class="btn btn-default next-step" (click)="onTab(4)">
+      <span translate>Continue</span
+      ><i
+        class="fas wizard-arrow"
+        [ngClass]="{'ml-1': !rtl, 'mr-1': rtl}"
+        [ngClass]="{'fa-angle-double-right': !rtl, 'fa-angle-double-left': rtl}"
+      ></i>
+    </button>
+  </li>
+</ul>

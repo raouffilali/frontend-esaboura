@@ -1,0 +1,118 @@
+
+<div class="card h-90 box-shadow-md border-none">
+  <div class="badge-tag" *ngIf="webinar?.featured && !(webinar?.lastDate < currentDate)">
+    <span translate>Featured</span>
+  </div>
+  <!-- Adding this block to mark the webinar as expired -->
+  <div class="expired" *ngIf="webinar?.lastDate < currentDate">
+    <span translate>Expired</span>
+  </div>
+  <!-- End of new block -->
+  <div class="image-course">
+    <a [routerLink]="['/groupclass/detail',webinar.alias]" class="hyperlink">
+      <img
+        src="{{webinar?.mainImage?.fileUrl}}"
+        class="card-img-top"
+        alt=""
+        onerror="this.src='/assets/images/no-image.jpg'"
+    /></a>
+    <a
+      class="hyperlink link-profile avatar-profile"
+      [routerLink]="['/tutors', webinar?.tutor?.username]"
+      [ngClass]="{'position-left': !rtl, 'position-right': rtl}"
+    >
+      <img
+        src="{{webinar?.tutor?.avatarUrl}}"
+        class="float-right cate-profile box-shadow-lg"
+        alt=""
+        onerror="this.src='/assets/images/no-image.jpg'"
+      />
+    </a>
+  </div>
+
+  <div class="card-body">
+    <div class="row mt-n5 row-cols-2">
+      <div class="col-md-12 pr-0">
+        <div class="profile-card">
+          <div class="profile">
+            <a class="hyperlink link-profile" [routerLink]="['/tutors', webinar?.tutor?.username]">
+              <h5 class="cate-profile-name pt-sm" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+                {{webinar?.tutor?.name }}
+              </h5>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-2 card-detail">
+        <div class="row mt-n10 row-cols-2">
+        <div class="col-md-7 pr-0">
+        <div [hidden]="!latestSlot" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <span class="text-secondary" [ngClass]="{'mr-1': !rtl, 'ml-1': rtl}"
+            ><i class="far fa-calendar" [ngClass]="{'mr-1': !rtl, 'ml-1': rtl}"></i>{{ latestSlot?.startTime|
+            date:'MMMdd, yyyy'}}</span
+          >
+          <span class="text-secondary"
+            ><i class="far fa-clock ml-2"></i>{{ latestSlot?.startTime| date:'HH:mm'}}</span
+          >
+        </div>
+        </div>
+        <div class="col-md-5" [ngClass]="{'pl-0': !rtl, 'pr-0': rtl}">
+          <div class="rating-stars rating-md-1 font-xs" [ngClass]="{'text-right': !rtl, 'text-left-important': rtl}">
+            <ul id="stars">
+              <star-rating [rate]="webinar?.tutor?.ratingAvg"></star-rating>
+              <span>{{webinar?.tutor?.ratingAvg}} ({{webinar?.tutor?.totalRating}})</span>
+            </ul>
+          </div>
+        </div>
+
+        </div>
+        <div class="card-content mt-3" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <a class="hyperlink" [ngClass]="{'text-left': !rtl, 'text-right': rtl}" [routerLink]="['/groupclass/detail',webinar.alias]" translate
+          >
+          <h5 class="card-title">{{webinar.name| ellipsis:60}}</h5>
+          </a
+          >
+          <!-- <app-text-ellipsis
+            [content]="webinar?.description"
+            [showChar]="50"
+            [path]="'/groupclass/detail'"
+            [param]="webinar?.alias"
+          ></app-text-ellipsis> -->
+        </div>
+      </div>
+    </div>
+    <div class="card-footer bg-transparent border-text-mute px-1 pt-1 pb-n1">
+      <div class="row row-cols-2">
+        <div class="col-md-6 p-1" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <a *ngIf="!webinar.booked && !(webinar?.lastDate < currentDate)" class="btn btn-green" [routerLink]="['/groupclass/detail',webinar.alias]" translate
+            >Book Now</a
+          >
+          <a
+            *ngIf="webinar.booked"
+            class="btn btn-purchased"
+            [routerLink]="['/groupclass/detail',webinar.alias]"
+            translate
+            >Purchased</a
+          >
+          <!-- ?? NEW FEATURE IF EXPIRED HE CAN SEE INFORMATIONS -->
+          <a *ngIf="webinar?.lastDate < currentDate" class="btn btn-green" [routerLink]="['/groupclass/detail',webinar.alias]" translate>More Info</a>
+        </div>
+        <div class="col-md-6 money p-1" [ngClass]="{'text-right': !rtl, 'text-left': rtl}">
+          <h5 class="color-light-red mt-2">
+            <strong *ngIf="!webinar.price || webinar.isFree" translate>Free</strong>
+            <strong *ngIf="webinar.price && webinar.price > 0 && config?.currencySymbol !=='DZD'"
+                          translate >
+                          {{ webinar.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '): 'symbol' : '1.0'}}
+                        </strong>
+            <strong *ngIf="webinar.price && webinar.price > 0 && config?.currencySymbol ==='DZD'"
+              translate>{{ webinar.price | currency :'DA ' : 'symbol' : '1.0'}} ({{ webinar.price / 100 | currency :'$ ' : 'symbol' : '1.0'}})</strong
+            >
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- </div> -->
+</div>
+

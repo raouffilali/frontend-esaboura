@@ -1,0 +1,47 @@
+<div class="modal-header">
+  <h3 *ngIf="price!=0" class="modal-title" id="modal-basic-title" translate>Confirm to redirect to the payment page</h3>
+  <h3 *ngIf="price===0" class="modal-title" id="modal-basic-title" translate>Booking confirmation</h3>
+  <button
+    type="button"
+    class="close"
+    aria-label="Close"
+    [ngClass]="{'margin-unset':rtl}"
+    (click)="activeModal.close({confirmed: false})"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" [ngClass]="{'text-right': rtl}">
+  <div class="row">
+    <div class="col-md-12">
+      <h5 *ngIf="price!=0 || (price === 0 && appliedCoupon)">
+        <span translate>Make your payment for the subject</span> <span translate>{{subject.name}}</span>
+        <span translate>with tutor</span> {{tutor?.name}}
+      </h5>
+      <h5 *ngIf="price===0 && !appliedCoupon">
+        <span translate>Confirm to book a free slot with</span> <span translate>{{subject.name}}</span>
+      </h5>
+      <p>
+        <strong><span translate>Time</span>:</strong> {{slot.startTime | date: 'dd/MM/yyyy HH:mma'}} - {{slot.toTime |
+        date:'dd/MM/yyyy HH:mma'}}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer confirm-book">
+  <div class="d-flex confirm-book-wallet">
+    <button class="btn btn-success btn-pink" type="button" (click)="confirm('stripe')">
+      <div *ngIf="price!=0"><span translate>PAY</span> {{config?.currencySymbol || '$'}}{{price}}</div>
+      <span *ngIf="price===0" translate>CONFIRM</span>
+    </button>
+  </div>
+  <div class="d-flex confirm-book-wallet" *ngIf="currentUser?.bonusClass>0 && price!==0">
+    <button class="btn btn-warning btn-pink" type="button" (click)="confirm('bonus-class')">
+      <div>
+        <span translate>USE BONUS CLASS</span>
+      </div>
+    </button>
+    <small class="mt-2"><span translate>Pending bonus class:</span><strong> {{currentUser?.bonusClass}}</strong></small>
+  </div>
+</div>

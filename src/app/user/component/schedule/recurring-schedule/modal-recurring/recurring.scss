@@ -1,0 +1,15 @@
+.modal-header {
+  border: none;
+  padding: 10px 10px;
+}
+.recurring-tab {
+  border: none;
+  li {
+    margin: 0px 10px;
+    padding: 10px;
+  }
+
+  li.active {
+    border-bottom: 2px solid #dc3545;
+  }
+}

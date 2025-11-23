@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h2 class="modal-title" style="font-size: 2em">{{lecture.title}}</h2>
+  <button
+    type="button"
+    class="close"
+    [ngClass]="{'margin-unset':rtl}"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div *ngIf="lecture&&lecture.mediaType=='video'">
+    <video class="mb-2" *ngIf="lecture" width="100%" src="{{lecture?.media?.fileUrl}}" controls></video>
+  </div>
+  <div *ngIf="lecture&&lecture.mediaType=='audio'">
+    <audio class="mb-2" *ngIf="lecture" width="100%" src="{{lecture?.media?.fileUrl}}" controls></audio>
+  </div>
+  <div *ngIf="lecture&&lecture.mediaType=='pdf'" class="mb-2">
+    <ngx-extended-pdf-viewer
+      [src]="lecture?.media?.fileUrl"
+      useBrowserLocale="true"
+      height="80vh"
+      [listenToURL]="true"
+    ></ngx-extended-pdf-viewer>
+  </div>
+</div>

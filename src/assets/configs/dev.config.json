@@ -1,0 +1,14 @@
+{
+    "production": false,
+    "version": "0.0.1",
+    "build": 1,
+    "showBuild": true,
+    "maximumFileSize": 1024,
+    "apiBaseUrl": "http://localhost:9000/v1",
+    "stripeKey": "pk_test_51ICH44Kd3OO2kXBrHboC6do0v3IxAPXeNfvUePcLWQGJ15jsXNe2O26RqhRZ3QnJsIX8cxLs7V9DUFbfPT8hSxoI00wNfKakjw",
+    "url": "http://localhost:4200",
+    "socketUrl": "http://localhost:9000",
+    "zoomSDK": "LYbt6hoGJDKCws6ZbWVTrfStwudNNHwayl0x",
+    "zoomDomain": "localhost",
+    "zoomSiteUrl": "http://localhost:1338"
+}

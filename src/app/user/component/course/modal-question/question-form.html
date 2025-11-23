@@ -1,0 +1,326 @@
+<div class="modal-header">
+  <h2 class="modal-title" translate>Q&A</h2>
+  <button
+    *ngIf="!updatingQuestion._id"
+    type="button"
+    class="close"
+    aria-label="Close"
+    (click)="activeModal.dismiss('Cross click')"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form #frmQuestion="ngForm" (submit)="submitQuestion(frmQuestion)" class="add-certification-form input-border">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label translate><span translate>Question Type</span><span class="required">*</span></label>
+          <select
+            name="type"
+            [disabled]="updatingQuestion._id"
+            class="form-control"
+            required
+            #type="ngModel"
+            [(ngModel)]="updatingQuestion.type"
+          >
+            <option value="single" selected translate>Single response</option>
+            <option translate value="multi">Multiple responses</option>
+            <option translate value="trueOrFalse">True or False</option>
+            <option translate value="matching">Drag & drop Matching</option>
+          </select>
+        </div>
+        <div *ngIf="type.errors && (type.dirty || type.touched || submitted)">
+          <p [hidden]="!type.errors.required" style="color: red" translate>Please choose type!</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label translate>Ordering</label>
+          <input
+            type="number"
+            name="ordering"
+            class="form-control"
+            placeholder="{{'Ordering'|translate}}"
+            [(ngModel)]="updatingQuestion.ordering"
+            #ordering="ngModel"
+          />
+          <div *ngIf="ordering.value < 0">
+            <p style="color: red" translate>Order must be greater than or equal to 0!</p>
+          </div>
+        </div>
+      </div>
+      <div
+        [ngClass]="{'col-md-12':updatingQuestion.type!=='trueOrFalse', 'col-md-8':updatingQuestion.type==='trueOrFalse' }"
+      >
+        <div class="form-group">
+          <label><span translate>Content</span><span class="required">*</span></label>
+
+          <textarea
+            style="min-height: 100px"
+            type="text"
+            name="content"
+            class="form-control"
+            placeholder="{{'Enter content'|translate}}"
+            [(ngModel)]="updatingQuestion.content"
+            required
+            #content="ngModel"
+          ></textarea>
+          <div *ngIf="content.errors && (content.dirty || content.touched || submitted)">
+            <p [hidden]="!content.errors.required" style="color: red" translate>Content is required!</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" *ngIf="updatingQuestion.type==='trueOrFalse'">
+        <label><span translate>Answer</span><span class="required">*</span></label>
+        <div class="form-control d-flex justify-content-center">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              [value]="true"
+              [(ngModel)]="updatingQuestion.isTrue"
+              type="radio"
+              name="trueOrFalse"
+              id="true"
+            />
+            <label translate class="form-check-label" for="true">True</label>
+          </div>
+          <div class="form-check ml-2">
+            <input
+              class="form-check-input"
+              [value]="false"
+              [(ngModel)]="updatingQuestion.isTrue"
+              type="radio"
+              name="trueOrFalse"
+              id="false"
+              checked
+            />
+            <label translate class="form-check-label" for="false">False</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 text-right">
+        <button type="submit" class="btn btn-danger mr-3" translate>
+          <span translate *ngIf="!updatingQuestion._id">Submit</span>
+          <span translate *ngIf="updatingQuestion._id">Update</span>
+        </button>
+        <button
+          type="button"
+          *ngIf="!updatingQuestion._id || (updatingQuestion._id && question.type==='trueOrFalse')"
+          class="btn btn-outline-dark"
+          (click)="activeModal.dismiss('Cross click')"
+          translate
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </form>
+  <form
+    *ngIf="updatingQuestion._id && (question.type==='single'|| question.type==='multi')"
+    #frmAnswer="ngForm"
+    (submit)="submitAnswer(frmAnswer)"
+    class="add-certification-form input-border form-answer mt-5"
+  >
+    <h5 translate class="text-center mt-3">Answers options</h5>
+    <div class="row" style="padding: 2em">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label><span translate>Content</span><span class="required">*</span></label>
+          <textarea
+            type="text"
+            style="min-height: 100px"
+            name="a_content"
+            class="form-control"
+            placeholder="{{'Enter answer content'|translate}}"
+            [(ngModel)]="answer.content"
+            required
+            #a_content="ngModel"
+          ></textarea>
+          <div *ngIf="a_content.errors && (a_content.dirty || a_content.touched || answerSubmitted)">
+            <p [hidden]="!a_content.errors.required" style="color: red" translate>Content is required!</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-control d-flex justify-content-center" style="margin-top: 2em">
+          <label class="custom-radio" translate
+            >True
+            <input type="radio" name="answer" [value]="true" [(ngModel)]="answer.isCorrect" />
+            <span class="checkmark"></span>
+          </label>
+          <label class="custom-radio" translate
+            >False
+            <input type="radio" name="answer" [value]="false" [(ngModel)]="answer.isCorrect" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="d-flex justify-content-end" id="answer-options">
+          <button class="btn btn-success" [ngClass]="{'ml-3': !answer._id}" type="submit" translate>
+            <span translate *ngIf="!answer._id">Add answer</span>
+            <span translate *ngIf="answer._id">Update</span>
+          </button>
+          <button *ngIf="answer._id" class="btn btn-danger ml-1" (click)="resetAnswer()" translate>Cancel</button>
+        </div>
+      </div>
+      <!-- <div class="col-md-2 d-flex justify-content-end" id="answer-options">
+        <button class="btn btn-success" [ngClass]="{'ml-3': !answer._id}" type="submit" translate>
+          <span translate *ngIf="!answer._id">Add answer</span>
+          <span translate *ngIf="answer._id">Update</span>
+        </button>
+        <button *ngIf="answer._id" class="btn btn-danger ml-1" (click)="resetAnswer()" translate>Cancel</button>
+      </div> -->
+
+      <div class="radio col-md-12 d-flex justify-content-between mt-3" *ngFor="let item of answers,let i  = index">
+        <div>
+          <label>
+            <input
+              *ngIf="question.type==='single'"
+              type="radio"
+              (click)="checkAnswer(item)"
+              name="answers_single"
+              [value]="true"
+              [checked]="item.isCorrect"
+            />
+            <input
+              *ngIf="question.type==='multi'"
+              type="radio"
+              (click)="checkAnswer(item)"
+              [name]="item._id"
+              [value]="true"
+              [checked]="item.isCorrect"
+            />
+            <span class="ml-3">{{item.content}}</span>
+          </label>
+        </div>
+        <div class="mr-3">
+          <a (click)="updateAnswer(item,i)"><i class="fa fa-edit text-success font-sm"></i></a>
+          <a (click)="removeAnswer(item,i)"><i class="fa fa-trash text-danger font-sm"></i></a>
+        </div>
+      </div>
+    </div>
+  </form>
+  <form
+    *ngIf="question._id && (question.type==='matching')"
+    #frmMatchingAnswer="ngForm"
+    (submit)="submitAnswer(frmMatchingAnswer)"
+    class="add-certification-form input-border form-answer mt-5"
+  >
+    <h5 translate class="text-center mt-3">Answers options</h5>
+    <div class="row" style="padding: 2em">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label><span translate>Content</span><span class="required">*</span></label>
+          <input
+            type="text"
+            name="a_content"
+            class="form-control"
+            placeholder="{{'Enter answer content'|translate}}"
+            [(ngModel)]="answer.content"
+            required
+            #a_content="ngModel"
+          />
+          <div *ngIf="a_content.errors && (a_content.dirty || a_content.touched || answerSubmitted)">
+            <p [hidden]="!a_content.errors.required" style="color: red" translate>Content is required!</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label><span translate>Label</span><span class="required">*</span></label>
+          <input
+            type="text"
+            name="label"
+            class="form-control"
+            placeholder="{{'Answer Label (eg: A, B, C, D)'|translate}}"
+            [(ngModel)]="answer.label"
+            #label="ngModel"
+            required
+          />
+          <div *ngIf="label.errors && (label.dirty || label.touched || answerSubmitted)">
+            <p [hidden]="!label.errors.required" style="color: red" translate>Answer label is required!</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-control d-flex justify-content-center" style="margin-top: 2em">
+          <label class="custom-radio" translate
+            >Column A
+            <input type="radio" name="answer" [value]="true" [(ngModel)]="answer.isColumnA" />
+            <span class="checkmark"></span>
+          </label>
+          <label class="custom-radio" translate
+            >Column B
+            <input type="radio" name="answer" [value]="false" [(ngModel)]="answer.isColumnA" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex justify-content-end" id="answer-options">
+        <button class="btn btn-success" type="submit" translate>
+          <span translate *ngIf="!answer._id">Add Answer</span>
+          <span translate *ngIf="answer._id">Update</span>
+        </button>
+        <button *ngIf="answer._id" class="btn btn-danger ml-1" (click)="resetAnswer()" translate>Cancel</button>
+      </div>
+
+      <div class="col-md-6 form-control mt-3 word-wrap">
+        <h6 class="text-center" translate>Column A</h6>
+        <hr />
+        <div class="d-flex justify-content-between" *ngFor="let item of answers, let i=index">
+          <div *ngIf="item.isColumnA" style="padding: 1em">
+            <div><b>{{item.label}}.</b><span> {{item.content}}</span></div>
+          </div>
+          <div *ngIf="item.isColumnA" class="mr-3" style="padding: 1em">
+            <a (click)="updateAnswer(item,i)"><i class="fa fa-edit text-success font-sm"></i></a>
+            <a (click)="removeAnswer(item,i)"><i class="fa fa-trash text-danger font-sm"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 form-control mt-3 word-wrap">
+        <h6 class="text-center" translate>Column B</h6>
+        <hr />
+        <div class="d-flex justify-content-between" *ngFor="let item of answers, let i=index">
+          <div *ngIf="!item.isColumnA" style="padding: 1em">
+            <div><b>{{item.label}}.</b><span> {{item.content}}</span></div>
+          </div>
+          <div *ngIf="!item.isColumnA" class="mr-3" style="padding: 1em">
+            <a (click)="updateAnswer(item,i)"><i class="fa fa-edit text-success font-sm"></i></a>
+            <a (click)="removeAnswer(item,i)"><i class="fa fa-trash text-danger font-sm"></i></a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-md-3 mt-3 d-flex justify-content-between align-items-baseline"
+        *ngFor="let item of columnAAnswers, let i=index"
+      >
+        <div *ngIf="answers?.length && columnAAnswers?.length && columnBAnswers?.length">
+          <span class="mr-1"><b>{{item.label}}</b> </span> <span class="mr-1" translate>matchs</span>
+          <select
+            style="min-width: 180px"
+            [name]="item._id"
+            class="form-control"
+            #matching="ngModel"
+            [(ngModel)]="item.matchingAnswerId"
+          >
+            <option *ngFor="let _item of columnBAnswers" [value]="_item._id">{{_item.label}}</option>
+          </select>
+        </div>
+      </div>
+      <div
+        class="col-md-3"
+        style="margin-top: 2.4em"
+        *ngIf="answers?.length && columnAAnswers?.length && columnBAnswers?.length"
+      >
+        <button type="button" (click)="saveMatching()" class="btn btn-success ml-3" translate>Save matching</button>
+      </div>
+    </div>
+  </form>
+  <div class="row" *ngIf="question._id && question.type!=='trueOrFalse'">
+    <div class="col-md-12 text-right">
+      <button (click)="done()" class="btn btn-danger mr-3" translate>Done</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,338 @@
+<div class="sm-padding table-default">
+  <div class="container" id="container_id">
+    <div class="row">
+      <div class="col-md-8" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <h3 class="mb-4 alert alert-info text text-center" id="title_id" translate>Payment Detail</h3>
+      </div>
+      <div class="col-md-2" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <!-- <h3 class="btn btn-default mt-3" translate>Print</h3> -->
+        <button (click)="printPage()" class="btn btn-default mt-3 hide-print" translate>Print</button>
+      </div>
+      <div class="col-md-2" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+        <!-- <h3 (click)="printPage()" class="btn btn-default mt-3 hide-print" translate>Download PDF</h3> -->
+          <button translate (click)="exportAsPDF('table_id')" class="btn btn-default mt-3 hide-print">Download PDF</button>
+      </div>
+    </div>
+    <!-- 
+    <div class="alert alert-info alert-dismissible fade show hide-print" *ngIf="transaction.payMethod === 'CIB'" translate>
+      <span translate> {{transaction?.paymentInfo?.actionCodeDescription}} </span>
+    </div>    
+    <div class="row" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+      <div class="col-md-12 hide-print" *ngIf="transaction.payMethod === 'CIB'" >        
+        <h6 class="color-light-red" translate>
+          <span translate>In case of payment problem, please contact the toll free number of SATIM 3020 </span> 
+          <img src="/assets/images/3020.png" alt="" class="image-md"  />
+        </h6>
+      </div>
+    </div>
+    -->
+      <div class="row hide-print" [ngClass]="{'text-left': !rtl, 'text-right': rtl}" *ngIf="transaction.payMethod === 'CIB' && transaction.status === 'completed'">
+        <form class="row col-md-12" #frmInvite="ngForm" (submit)="sendEmail()" ngNativeValidate>
+          <div class="col-md-10 form-group input-border mb-0">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="{{'A confirmation email was sent before. Enter recipient\'s email here if you want to resend it' | translate}}"
+              [(ngModel)]="emailSend"
+              name="email-send"
+              #emailSendReceipt="ngModel"
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+              required
+            />
+            <div *ngIf="emailSendReceipt.errors && (emailSendReceipt.dirty || emailSendReceipt.touched)">
+              <p [hidden]="!emailSendReceipt.errors.required" class="error" translate>Email is required</p>
+              <p [hidden]="!emailSendReceipt.errors.pattern" class="error" translate>Email is invalid format</p>
+            </div>
+          </div>
+          <div class="col-md-2"> 
+            <button class="btn btn-green mr-2 btn-pay-now" type="submit" translate>Send</button>
+            <!-- <button (click)="printPage()" class="btn btn-green mr-2 btn-pay-now" translate>Send</button> -->
+          </div>
+        </form>
+      </div>
+    
+    <div class="row" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+      <div class="col-md-12" id="my_certificate">
+        <table
+          id="table_id"
+          class="table table-horizontal tble-responsive"
+          [ngClass]="{'text-left': !rtl, 'text-right': rtl}"
+        >
+          
+            <!--  SATIM VALID -->
+          <tbody *ngIf="transaction.payMethod === 'CIB'" class="satim valid" >
+            <tr>
+              <td colspan="2" class="label label-light-primary text-center"><strong translate>Tansaction Details</strong> : </td>
+            </tr>            
+              <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+                <td translate><span class="payment-detail-text" translate>Response</span>:</td>
+                <td><span class="label label-light-primary">{{transaction?.paymentInfo?.params.respCode_desc}}</span></td>
+              </tr>
+              <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+                <td><span translate class="payment-detail-text">Satim transaction code</span> :</td>
+                <td>
+                  <span>{{transaction?.paymentInfo?.satim_orderId}}</span>
+                </td>
+              </tr>
+              <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+                <td><span translate class="payment-detail-text">Transaction code</span> :</td>
+              <td>
+                <span>{{transaction?.code}}</span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+              <td><span translate class="payment-detail-text">Satim approval code</span> :</td>
+              <td>
+                <span>{{transaction?.paymentInfo?.approvalCode}}</span>
+              </td>     
+            </tr>            
+            <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+              <td translate><span class="payment-detail-text" translate>Created On</span>:</td>
+              <td><strong><span class="label label-light-info">{{transaction?.createdAt | date:'dd/MM/yyyy HH:mm' : 'UTC + 1'}}</span></strong></td>
+            </tr>
+            <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+              <td translate><span class="payment-detail-text" translate>Amount</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.Amount / 100}}</span><span translate> DZD</span></td>
+            </tr>
+            <tr *ngIf="transaction.paymentInfo.params.respCode === '00'">
+              <td><span translate class="payment-detail-text">Payment mode</span> :</td>
+              <td>
+                <span>CIB/Edhahabia</span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction.paymentInfo.ErrorCode === '3'">
+              <td translate><span class="payment-detail-text" translate>actionCodeDescription</span>:</td>
+              <td><span class="label label-light-warning" >{{transaction?.paymentInfo?.actionCodeDescription}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td colspan="2">
+                <h6 class="color-light-red" translate>
+                  <span class="text-center">In case of payment problem, please contact the toll free number of SATIM 3020 </span> 
+                  <img src="/assets/images/3020.png" alt="" class="image-md"  />
+                </h6>
+              </td>
+              </tr>
+              
+            <!-- Fin Recomanded  -->
+            <!-- <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td><span translate class="payment-detail-text" translate>Card holder name</span> :</td>
+              <td>
+                <span>{{transaction?.paymentInfo?.cardholderName}}</span>
+              </td>
+            </tr> -->
+            <!--  -->
+            <!-- <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>expiration</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.expiration}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>Pan</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.Pan}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>depositAmount</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.depositAmount}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>currency</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.currency}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>actionCodeDescription</span>:</td>
+              <td><span class="label label-light-primary">{{transaction?.paymentInfo?.actionCodeDescription}}</span></td>
+            </tr>  
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>Ip</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.Ip}}</span></td>
+            </tr>
+            <tr *ngIf="transaction.payMethod === 'CIB'">
+              <td translate><span class="payment-detail-text" translate>SvfeResponse</span>:</td>
+              <td><span>{{transaction?.paymentInfo?.SvfeResponse}}</span></td>
+            </tr>
+            -->  
+            <!-- Cas de paiment non accepté -->
+          </tbody>
+          <tbody>
+            <tr>
+              <td colspan="2" class="label label-light-primary text-center"><strong translate>Course Details</strong> : </td>
+            </tr>    
+            <tr>
+              <td><span translate class="payment-detail-text">Tutor Name</span> :</td>
+              <td>
+                <a
+                  class="color-light-red"
+                  [routerLink]="['/tutors', transaction.tutor.username]"
+                  *ngIf="transaction && transaction.tutor"
+                  >{{transaction?.tutor?.name}}</a
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><span translate class="payment-detail-text">Type</span>:</td>
+              <td>
+                <span class="label label-light-info" *ngIf="transaction?.type === 'booking'" translate>Booking</span>
+                <span class="label label-light-warning" *ngIf="transaction?.type === 'gift'" translate>Gift</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span translate class="payment-detail-text">Enroll Type</span> :</td>
+              <td>
+                <span class="label label-light-info" *ngIf="transaction?.targetType === 'webinar'" translate
+                  >Webinar</span
+                >
+                <span class="label label-light-info" *ngIf="transaction?.targetType === 'subject'" translate
+                  >1 vs 1</span
+                >
+                <span class="label label-light-info" *ngIf="transaction?.targetType === 'course'" translate
+                  >Course</span
+                >
+              </td>
+            </tr>
+            <tr>
+              <td><span translate class="payment-detail-text">Title</span>:</td>
+              <td>
+                <span *ngIf="transaction?.tutorSubject?.name">{{transaction?.tutorSubject?.name}} - </span>
+                <a
+                  class="color-light-red"
+                  [routerLink]="['/groupclass/detail', transaction.webinar.alias]"
+                  *ngIf="transaction.targetType === 'webinar'"
+                  >{{transaction.webinar && transaction.targetType === 'webinar' ? transaction?.webinar?.name : ''}}</a
+                >
+                <a
+                  class="color-light-red"
+                  [routerLink]="['/courses/detail', transaction.course.alias]"
+                  *ngIf="transaction.targetType === 'course'"
+                  >{{transaction.course && transaction.targetType === 'course' ? transaction?.course?.name : ''}}</a
+                >
+                <span
+                  >{{transaction.subject && transaction.targetType === 'subject' ? transaction?.subject?.name :
+                  ''}}</span
+                >
+              </td>
+            </tr>            
+            <tr *ngIf="transaction.payMethod !== 'CIB'">
+              <td>
+                <span translate *ngIf="transaction.couponCode || transaction.payMethod === 'bonus-class'"
+                  >Original price:</span
+                ><span translate *ngIf="!transaction.couponCode && !(transaction.payMethod == 'bonus-class')"
+                  >Price:</span
+                >
+              </td>
+              <td>
+                <span *ngIf="!transaction.usedCoupon && !(transaction.payMethod == 'bonus-class')">
+                  {{transaction.price | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' : '$ '):
+                  'symbol' : '1.0'}}
+                </span>
+                <span *ngIf="transaction.usedCoupon|| transaction.payMethod === 'bonus-class'">
+                  {{transaction.discountAmount + transaction.discountPrice | currency : (config?.currencySymbol ?
+                  config?.currencySymbol + ' ' : '$ '): 'symbol' : '1.0'}}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction.usedCoupon|| transaction.payMethod === 'bonus-class'">
+              <td translate>Discount Amount:</td>
+              <td>
+                <span
+                  >{{transaction?.discountAmount | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' :
+                  '$ '): 'symbol' : '1.0'}}</span
+                >
+              </td>
+            </tr>
+            <tr *ngIf="transaction.usedCoupon|| transaction.payMethod === 'bonus-class'">
+              <td translate>Discount Price:</td>
+              <td>
+                <span
+                  >{{transaction?.discountPrice | currency : (config?.currencySymbol ? config?.currencySymbol + ' ' :
+                  '$'): 'symbol' : '1.0'}}</span
+                >
+                <span *ngIf="transaction.payMethod === 'bonus-class'">
+                  - <span translate>booked with bonus class</span>
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="transaction.usedCoupon">
+              <td translate>Coupon Code:</td>
+              <td><span>{{transaction?.couponInfo?.couponCode}}</span></td>
+            </tr>            
+            <tr>
+              <td><span translate class="payment-detail-text">Status</span>:</td>
+              <td>
+                <span class="label label-light-warning" *ngIf="transaction?.status === 'pending'" translate
+                  >Pending</span
+                >
+                <span class="label label-light-danger" *ngIf="transaction?.status === 'canceled'" translate
+                  >Canceled</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'progressing'" translate
+                  >In Progress</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'completed'" translate
+                  >Completed</span
+                >
+                <span class="label label-light-warning" *ngIf="transaction?.status === 'pending-refund'" translate
+                  >Pending refund</span
+                >
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'approved-refund'" translate>
+                  Approved refund
+                </span>
+                <span class="label label-light-primary" *ngIf="transaction?.status === 'refunded'" translate
+                  >Refunded</span
+                >&nbsp;
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div
+        class="col-md-12 mt-4 hide-print"
+        *ngIf="transaction?.price > 0 && (transaction.targetType === 'subject' || transaction.targetType === 'webinar') && transaction.status === 'completed'"
+      >
+        <div class="card-horizontal p-4 text-border" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <p class="text-secondary" translate *ngIf="transaction.targetType === 'subject'">
+            If the tutor did not join the 1 on 1 class or If you cannot join the 1 on 1 class, please send us a refund
+            request. We will review and respond to you. You can only send a refund request within 3 days after the class
+            is completed.
+          </p>
+          <p class="text-secondary" translate *ngIf="transaction.targetType === 'webinar'">
+            If the tutor did not join the group class or If you cannot join the group class, please send us a refund
+            request. We will review and respond to you. You can only send a refund request within 3 days after the class
+            is completed.
+          </p>
+          <form>
+            <div class="form-group">
+              <label translate>Reason</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                placeholder="{{'Enter some text here'| translate}}"
+                [(ngModel)]="reason"
+                name="reason"
+              ></textarea>
+            </div>
+            <!-- <button class="btn btn-default mt-3" (click)="request('before')" translate>Can't join the course</button
+            >&nbsp; -->
+            <button class="btn btn-default mt-3 ml-3" (click)="request('after')" translate>Refund Request</button>
+          </form>
+        </div>
+      </div>
+      <div class="col-md-12 mt-4 hide-print" *ngIf="transaction?.price > 0 && transaction.targetType === 'course'">
+        <div class="card-horizontal p-4 text-border" [ngClass]="{'text-left': !rtl, 'text-right': rtl}">
+          <h6 class="mb-4" translate >Refund request</h6>  
+          <form>
+            <div class="form-group">
+              <label translate>Reason</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                placeholder="{{'Enter some text here'| translate}}"
+                [(ngModel)]="reason"
+                name="reason"
+              ></textarea>
+            </div>
+            <button class="btn btn-default mt-3" (click)="request()" translate>Request</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
